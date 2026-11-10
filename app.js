@@ -77,19 +77,23 @@
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(readForm())); } catch (e) { /* ignore */ }
   }
 
-  function restore() {
-    var saved;
-    try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); } catch (e) { saved = null; }
-    if (!saved) return;
+  function fillForm(values) {
+    form.reset();
     ['eventName', 'eventDate', 'venue', 'client', 'eventType', 'preparedBy'].forEach(function (n) {
-      if (saved[n] != null) form.elements[n].value = saved[n];
+      if (values[n] != null) form.elements[n].value = values[n];
     });
-    form.elements.staff.value = saved.staffRaw || '';
-    if (saved.blankRows != null) form.elements.blankRows.value = saved.blankRows;
-    (saved.activities || []).forEach(function (key) {
+    form.elements.staff.value = values.staffRaw || '';
+    if (values.blankRows != null) form.elements.blankRows.value = values.blankRows;
+    (values.activities || []).forEach(function (key) {
       var box = form.querySelector('input[name="activities"][value="' + key + '"]');
       if (box) box.checked = true;
     });
+  }
+
+  function restore() {
+    var saved;
+    try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); } catch (e) { saved = null; }
+    if (saved) fillForm(saved);
   }
 
   restore();
@@ -157,6 +161,27 @@
     return html + '</section>';
   }
 
+  /* Wind action plan: one row per wind-sensitive structure in use (outdoor events only). */
+  function windPlan(v, isOutdoor) {
+    if (!isOutdoor) return '';
+    var rows = (DATA.windPlan || []).filter(function (r) { return v.activities.indexOf(r.activity) !== -1; });
+    if (!rows.length) return '';
+    var blank = '<span class="fill-in">____ m/s</span>';
+    return '<h4>Wind action plan</h4>' +
+      '<p>Fill in each structure\'s figures from its supplier\'s design calculations or operations manual. Use gust speed. ' +
+      'Read the anemometer every 30 minutes, and every 15 minutes once any structure reaches amber.</p>' +
+      '<table class="ra-table wind-table"><thead><tr><th>Structure</th><th>Max design gust</th>' +
+      '<th>Amber trigger and action</th><th>Red trigger and action</th></tr></thead><tbody>' +
+      rows.map(function (r) {
+        return '<tr><td data-label="Structure">' + esc(r.structure) + '</td>' +
+          '<td data-label="Max design gust">' + blank + '</td>' +
+          '<td data-label="Amber trigger and action">' + blank + '<br>' + esc(r.amber) + '</td>' +
+          '<td data-label="Red trigger and action">' + blank + '<br>' + esc(r.red) + '</td></tr>';
+      }).join('') +
+      '</tbody></table>' +
+      '<p class="note">1 m/s ≈ 2.24 mph. Anemometer read and logged by: ____________________</p>';
+  }
+
   function render(v) {
     var type = DATA.eventTypes[v.eventType];
     var ctx = { public: type.public };
@@ -164,7 +189,8 @@
 
     // Outdoor weather row: skip for corporate events unless a marquee/tent is in use.
     var isOutdoor = v.eventType !== 'corporate' || v.activities.indexOf('marquee') !== -1;
-    var generalHazards = DATA.general.hazards.filter(function (h) { return !h.outdoor || isOutdoor; });
+    function applies(h) { return !h.outdoor || isOutdoor; }
+    var generalHazards = DATA.general.hazards.filter(applies);
 
     var M = DATA.method;
     var html = '';
@@ -204,7 +230,7 @@
     html += '<section class="doc-section"><h2>3. Risk assessments</h2>';
     html += riskTable(DATA.general.label, '3.1', generalHazards, ctx);
     selected.forEach(function (a, i) {
-      html += riskTable(a.label, '3.' + (i + 2), a.hazards, ctx);
+      html += riskTable(a.label, '3.' + (i + 2), a.hazards.filter(applies), ctx);
     });
     html += '</section>';
 
@@ -218,15 +244,16 @@
     html += methodPhase('Pack-down', '4.3', M.packdownBefore, phase('packdown'), M.packdownAfter);
     html += '</section>';
 
-    /* 5. PPE and emergency arrangements */
+    /* 5. PPE, weather and emergency arrangements */
     var ppe = ['Safety boots (toe protection)', 'High-visibility vest or jacket'];
     if (v.activities.some(function (k) { return ['rigging', 'height', 'marquee', 'staging'].indexOf(k) !== -1; })) ppe.push('Hard hat in overhead work areas and exclusion zones');
     if (v.activities.some(function (k) { return ['fencing', 'manual', 'staging', 'marquee'].indexOf(k) !== -1; })) ppe.push('Work gloves suited to the task');
     if (v.activities.indexOf('rigging') !== -1) ppe.push('Hearing protection during sound checks and performances');
     if (v.activities.indexOf('height') !== -1) ppe.push('Harness and restraint lanyard in MEWP baskets');
 
-    html += '<section class="doc-section"><h2>5. PPE and emergency arrangements</h2>' +
+    html += '<section class="doc-section"><h2>5. PPE, weather and emergency arrangements</h2>' +
       '<h4>Required PPE</h4><ul>' + ppe.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul>' +
+      windPlan(v, isOutdoor) +
       '<h4>Emergency arrangements</h4>' +
       '<table class="meta-table emergency"><tbody>' +
       '<tr><th>Emergency services</th><td>999 / 112</td></tr>' +
@@ -260,7 +287,6 @@
 
     doc.innerHTML = html;
     makeEditable();
-    document.title = 'RAMS – ' + v.eventName;
   }
 
   /* Let the user tweak text in place before printing. */
@@ -280,7 +306,248 @@
     badge.dataset.rating = next;
     badge.className = 'rating rating-' + next;
     badge.textContent = capitalise(next);
+    markDirty();
   });
+
+  /* Paste as plain text so formatting from other apps doesn't end up in the document. */
+  doc.addEventListener('paste', function (e) {
+    if (!e.target.closest('[contenteditable="true"]')) return;
+    e.preventDefault();
+    var text = (e.clipboardData || window.clipboardData).getData('text/plain');
+    document.execCommand('insertText', false, text);
+  });
+
+  doc.addEventListener('input', markDirty);
+
+  /* ---------- Saved RAMS (stored in this browser) ---------- */
+
+  var SAVED_KEY = 'rams-generator:saved';
+  var savedSection = document.getElementById('saved-section');
+  var savedList = document.getElementById('saved-list');
+  var savedEmpty = document.getElementById('saved-empty');
+  var savedCount = document.getElementById('saved-count');
+  var storageError = document.getElementById('storage-error');
+  var saveBtn = document.getElementById('save-btn');
+  var saveStatus = document.getElementById('save-status');
+  var editingBanner = document.getElementById('editing-banner');
+  var editingName = document.getElementById('editing-name');
+
+  var currentId = null;   // id of the saved RAMS being viewed/edited, or null for a new one
+  var currentValues = null;
+  var dirty = false;
+
+  function loadAll() {
+    try {
+      var list = JSON.parse(localStorage.getItem(SAVED_KEY) || '[]');
+      return Array.isArray(list) ? list : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function storeAll(list) {
+    localStorage.setItem(SAVED_KEY, JSON.stringify(list));
+  }
+
+  function findSaved(id) {
+    return loadAll().filter(function (r) { return r.id === id; })[0] || null;
+  }
+
+  function newId() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+
+  function formatStamp(ms) {
+    return new Date(ms).toLocaleString('en-GB', {
+      day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+  }
+
+  function formatTime(ms) {
+    return new Date(ms).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function showStorageError(msg) {
+    storageError.textContent = msg;
+    storageError.hidden = !msg;
+  }
+
+  /* Strip anything executable from stored HTML before putting it back into the page. */
+  function cleanHtml(html) {
+    var tpl = document.createElement('template');
+    tpl.innerHTML = html;
+    tpl.content.querySelectorAll('script, iframe, object, embed, link, meta, style, form').forEach(function (el) { el.remove(); });
+    tpl.content.querySelectorAll('*').forEach(function (el) {
+      Array.prototype.slice.call(el.attributes).forEach(function (attr) {
+        var name = attr.name.toLowerCase();
+        if (name.indexOf('on') === 0 || /^\s*javascript:/i.test(attr.value)) el.removeAttribute(attr.name);
+      });
+    });
+    return tpl.innerHTML;
+  }
+
+  function updateSaveUI() {
+    saveBtn.textContent = currentId ? 'Save changes' : 'Save RAMS';
+    if (dirty) {
+      saveStatus.textContent = currentId ? 'Unsaved changes' : 'Not saved yet';
+      saveStatus.className = 'save-status is-dirty';
+    } else if (currentId) {
+      var rec = findSaved(currentId);
+      saveStatus.textContent = rec ? 'Saved in this browser at ' + formatTime(rec.updatedAt) : '';
+      saveStatus.className = 'save-status is-saved';
+    } else {
+      saveStatus.textContent = '';
+      saveStatus.className = 'save-status';
+    }
+    var rec2 = currentId && findSaved(currentId);
+    editingBanner.hidden = !rec2;
+    if (rec2) editingName.textContent = rec2.title;
+  }
+
+  function markDirty() {
+    if (output.hidden) return;
+    dirty = true;
+    updateSaveUI();
+  }
+
+  function setClean() {
+    dirty = false;
+    updateSaveUI();
+  }
+
+  function saveCurrent() {
+    if (!currentValues) return;
+    var list = loadAll();
+    var now = Date.now();
+    var record = {
+      version: 1,
+      id: currentId || newId(),
+      title: currentValues.eventName,
+      values: currentValues,
+      html: doc.innerHTML,
+      createdAt: now,
+      updatedAt: now
+    };
+    var idx = -1;
+    list.forEach(function (r, i) { if (r.id === record.id) idx = i; });
+    if (idx !== -1) {
+      record.createdAt = list[idx].createdAt || now;
+      list[idx] = record;
+    } else {
+      list.push(record);
+    }
+    try {
+      storeAll(list);
+    } catch (e) {
+      saveStatus.textContent = 'Couldn’t save: this browser’s storage is full or blocked. Delete some saved RAMS and try again.';
+      saveStatus.className = 'save-status is-error';
+      return;
+    }
+    currentId = record.id;
+    setClean();
+    renderSavedList();
+  }
+
+  function deleteSaved(id) {
+    var list = loadAll().filter(function (r) { return r.id !== id; });
+    try {
+      storeAll(list);
+    } catch (e) {
+      showStorageError('Couldn’t delete: this browser is blocking storage.');
+      return;
+    }
+    if (currentId === id) {
+      currentId = null;
+      currentValues = null;
+      dirty = false;
+    }
+    updateSaveUI();
+    renderSavedList();
+  }
+
+  function openSaved(id) {
+    var rec = findSaved(id);
+    if (!rec) return;
+    if (dirty && rec.id !== currentId && !confirm('You have unsaved changes to the current RAMS. Open this one anyway?')) return;
+    currentId = rec.id;
+    currentValues = rec.values;
+    fillForm(rec.values);
+    save(); // keep the form autosave in step with what's on screen
+    doc.innerHTML = cleanHtml(rec.html);
+    makeEditable();
+    showDocument(rec.title);
+    setClean();
+  }
+
+  function renderSavedList() {
+    var list = loadAll().sort(function (a, b) { return b.updatedAt - a.updatedAt; });
+    savedEmpty.hidden = list.length > 0;
+    savedCount.textContent = list.length ? String(list.length) : '';
+    savedList.innerHTML = list.map(function (r) {
+      var v = r.values || {};
+      var type = DATA.eventTypes[v.eventType];
+      var meta = [formatDate(v.eventDate), v.venue, type && type.label].filter(Boolean).map(esc).join(' · ');
+      return '<li class="saved-item' + (r.id === currentId ? ' is-current' : '') + '" data-id="' + esc(r.id) + '">' +
+        '<div class="saved-info">' +
+        '<strong class="saved-title">' + esc(r.title || 'Untitled RAMS') + '</strong>' +
+        '<span class="saved-meta">' + meta + '</span>' +
+        '<span class="saved-stamp">Last saved ' + esc(formatStamp(r.updatedAt)) + '</span>' +
+        '</div>' +
+        '<div class="saved-actions">' +
+        '<button type="button" class="btn btn-secondary btn-small" data-action="open">Open</button>' +
+        '<button type="button" class="btn btn-danger btn-small" data-action="delete">Delete</button>' +
+        '</div></li>';
+    }).join('');
+  }
+
+  /* Delete needs a second tap within a few seconds, so a stray tap can't lose work. */
+  savedList.addEventListener('click', function (e) {
+    var btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+    var id = btn.closest('.saved-item').dataset.id;
+    if (btn.dataset.action === 'open') return openSaved(id);
+    if (btn.dataset.armed === 'true') return deleteSaved(id);
+    btn.dataset.armed = 'true';
+    btn.textContent = 'Tap again to delete';
+    setTimeout(function () {
+      if (!btn.isConnected) return;
+      btn.dataset.armed = '';
+      btn.textContent = 'Delete';
+    }, 4000);
+  });
+
+  window.addEventListener('beforeunload', function (e) {
+    if (dirty) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
+
+  /* Keep the list in step if another tab saves or deletes. */
+  window.addEventListener('storage', function (e) {
+    if (e.key === SAVED_KEY) { renderSavedList(); updateSaveUI(); }
+  });
+
+  /* ---------- Screens ---------- */
+
+  function showDocument(title) {
+    form.hidden = true;
+    savedSection.hidden = true;
+    output.hidden = false;
+    document.title = 'RAMS – ' + title;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function showStart(scrollTarget) {
+    output.hidden = true;
+    form.hidden = false;
+    savedSection.hidden = false;
+    document.title = 'RAMS Generator';
+    renderSavedList();
+    updateSaveUI();
+    if (scrollTarget) scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    else window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
   /* ---------- Events ---------- */
 
@@ -295,17 +562,32 @@
       return;
     }
     errorBox.hidden = true;
+    currentValues = v;
     render(v);
-    form.hidden = true;
-    output.hidden = false;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    showDocument(v.eventName);
+    dirty = true;
+    updateSaveUI();
   });
 
+  saveBtn.addEventListener('click', saveCurrent);
+
   document.getElementById('edit-btn').addEventListener('click', function () {
-    output.hidden = true;
-    form.hidden = false;
-    document.title = 'RAMS Generator';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    showStart(form);
+  });
+
+  document.getElementById('list-btn').addEventListener('click', function () {
+    showStart(savedSection);
+  });
+
+  document.getElementById('new-btn').addEventListener('click', function () {
+    if (dirty && !confirm('You have unsaved changes to this RAMS. Start a new one anyway?')) return;
+    currentId = null;
+    currentValues = null;
+    dirty = false;
+    form.reset();
+    form.querySelectorAll('.invalid').forEach(function (el) { el.classList.remove('invalid'); });
+    try { localStorage.removeItem(STORAGE_KEY); } catch (err) { /* ignore */ }
+    showStart(form);
   });
 
   document.getElementById('print-btn').addEventListener('click', function () {
@@ -319,4 +601,14 @@
     errorBox.hidden = true;
     try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignore */ }
   });
+
+  /* Check storage works at all, then show the list. */
+  try {
+    localStorage.setItem(SAVED_KEY + ':probe', '1');
+    localStorage.removeItem(SAVED_KEY + ':probe');
+  } catch (e) {
+    showStorageError('This browser is blocking storage (for example, in a private window), so RAMS can’t be saved here.');
+    saveBtn.disabled = true;
+  }
+  renderSavedList();
 })();

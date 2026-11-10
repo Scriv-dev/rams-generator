@@ -47,11 +47,19 @@ window.RAMS_DATA = {
         actions: 'Site walk at start of each shift; crew chief to monitor housekeeping throughout.'
       },
       {
-        hazard: 'Adverse weather – high wind, rain, lightning, heat or cold',
+        hazard: 'Wind loading on temporary structures (marquees, stages, towers, fencing, banners) causing collapse, uplift or flying debris',
         who: 'Crew, contractors, {public}',
-        controls: 'Weather forecast checked daily; wind speed monitored with anemometer; work stopped at manufacturer limits for structures; water, shade and warm clothing available.',
+        controls: 'Each structure\'s maximum design wind speed (gust, in m/s or mph) is taken from its supplier\'s design calculations or operations manual and written into the wind action plan (section 5), with amber and red trigger speeds and the action at each. Wind measured with an anemometer mounted clear of obstructions at or near the height of the tallest structure, read every 30 minutes (every 15 minutes at amber) and logged. Gust speed is used for decisions, not the average. Met Office forecast and warnings checked every morning and before each build or event day.',
         rating: 'medium',
-        actions: 'Agree a written adverse weather plan with wind-speed trigger points before build starts.',
+        actions: 'Fill in the wind action plan with every structure\'s figures before build starts and brief crew chiefs on who calls amber and red. Name the person responsible for reading and logging the anemometer.',
+        outdoor: true
+      },
+      {
+        hazard: 'Rain, lightning, heat or cold affecting crew and ground conditions',
+        who: 'Crew, contractors, {public}',
+        controls: 'Rain: trackway and matting laid on soft ground, and electrical connectors raised and covered. Lightning: work at height and on metal structures stops when thunder is heard or lightning is seen, and resumes 30 minutes after the last strike. Heat: drinking water, shade and sun cream provided, with heavy work moved to cooler hours. Cold: warm welfare area and hot drinks provided.',
+        rating: 'low',
+        actions: 'Crew chief to check the forecast each morning and adjust the work plan.',
         outdoor: true
       },
       {
@@ -84,11 +92,46 @@ window.RAMS_DATA = {
       short: 'Temporary power, generators and cable runs',
       hazards: [
         {
-          hazard: 'Electric shock or electrocution from temporary supplies, damaged cables or connectors',
-          who: 'Electricians, crew, {public}',
-          controls: 'System designed and installed by a competent electrician in line with BS 7909; RCD protection on final circuits; all equipment PAT tested and visually inspected before use; IP-rated connectors used outdoors.',
+          hazard: 'Electric shock from an earth fault on a final circuit (damaged lead, water ingress, faulty appliance)',
+          who: 'Electricians, crew, performers, {public}',
+          controls: 'Every final circuit protected by a 30 mA RCD (RCBO or RCD-protected distro way), including all socket outlets up to 32 A and every circuit the public can reach, in line with BS 7671 and BS 7909. Upstream distribution protected by time-delayed (S-type) 100 mA or 300 mA RCDs so a fault trips only the circuit affected. Electrician tests each RCD with an RCD tester before energising: trip time recorded on the BS 7909 installation certificate. No equipment plugged in without RCD protection, including "just for a minute" use.',
           rating: 'medium',
-          actions: 'Electrical installation to be tested and certified before energising; certificate kept on site.'
+          actions: 'Press the RCD test button on every distro at the start of each day and log the result. Any RCD that fails to trip: isolate the circuit and call the electrician. Do not reset an RCD that trips repeatedly; find and remove the fault first.'
+        },
+        {
+          hazard: 'Electric shock or loss of earth from incorrect generator earthing or a broken protective conductor',
+          who: 'Electricians, crew, {public}',
+          controls: 'Earthing arrangement (generator star point bonded, earth electrode where the design requires it) set by the system designer and confirmed by test: earth electrode resistance and earth fault loop impedance recorded on the certificate. Generator frame and distribution bonded. Only one generator feeds each system unless designed for paralleling.',
+          rating: 'low',
+          actions: 'Electrician re-tests earthing if a generator is swapped or moved during the event.'
+        },
+        {
+          hazard: 'Shock or short circuit from unsuitable outdoor connectors and cable',
+          who: 'Crew, {public}',
+          controls: 'Outdoors, only BS EN 60309 (CEE-form) connectors rated IP44 or better are used; no 13 A domestic plugs, multi-way adaptors or domestic extension reels outside. Connectors kept off the ground on cable stands or in IP-rated boxes away from standing water. Cable is H07RN-F (heavy-duty rubber) or equivalent. Hand tools on site run on 110 V centre-tapped-earth (CTE) supplies or are battery powered.',
+          rating: 'low',
+          actions: 'Visual check of all leads and connectors before connection; damaged items tagged "DO NOT USE" and removed from site.'
+        },
+        {
+          hazard: 'Cable overheating or fire from coiled cable or undersized cable under load',
+          who: 'Crew, {public}',
+          controls: 'Cable drums and reels fully unwound before load is applied; surplus cable laid in a loose figure-of-eight, never tight coils. Cable size chosen by the electrician for load, run length and voltage drop. Cable not run under carpet, matting or insulation unless sized for it.',
+          rating: 'low',
+          actions: 'Electrician to spot-check cable and connector temperatures by touch or thermal camera once the full load is on.'
+        },
+        {
+          hazard: 'Trips over cable runs in pedestrian areas',
+          who: 'Crew, {public}',
+          controls: 'Cable routes planned on the site plan before arrival: run along fence lines, building edges and the backs of structures, not across open walkways. Where a crossing is unavoidable, cable is laid in a yellow-lidded pedestrian cable protector with bevelled edges (or a wheelchair-accessible ramp on accessible routes), butted together with no gaps, and the ends taped down. Cables crossing an exit route are flown or ramped, never left loose. Power, audio and data run in separate channels of the protector.',
+          rating: 'low',
+          actions: 'Check every crossing at each site walk; reseat any ramp that has shifted and re-tape lifted ends.'
+        },
+        {
+          hazard: 'Cable crushed or severed where it crosses a vehicle route, causing shock or loss of power',
+          who: 'Drivers, crew, {public}',
+          controls: 'Vehicle crossings use heavy-duty cable protectors rated for the heaviest vehicle on site (axle load stated by the manufacturer), pinned or ballasted so they cannot creep, with crossing signs on both approaches. Alternatively cable is flown on a cable bridge or catenary with clearance above the tallest vehicle expected and goal-post height markers on each side. Cable is never buried in loose ground or left exposed on a vehicle route.',
+          rating: 'low',
+          actions: 'Re-inspect vehicle crossings after each delivery window.'
         },
         {
           hazard: 'Generator fire, fuel spillage or exhaust fumes',
@@ -96,13 +139,6 @@ window.RAMS_DATA = {
           controls: 'Generators positioned in ventilated areas away from public and structures; fenced off; spill kits and drip trays provided; refuelling only when stopped and cool; fire extinguisher at each generator.',
           rating: 'low',
           actions: 'Nominate a responsible person for refuelling and log fuel deliveries.'
-        },
-        {
-          hazard: 'Trip hazard and cable damage from cable runs across walkways and vehicle routes',
-          who: 'Crew, {public}',
-          controls: 'Cables routed overhead or around walkways where possible; heavy-duty cable ramps used at crossings; cables protected from vehicle traffic.',
-          rating: 'low',
-          actions: 'Check cable runs at each site walk and replace any damaged ramps.'
         },
         {
           hazard: 'Overloading of circuits or distribution leading to overheating',
@@ -116,13 +152,17 @@ window.RAMS_DATA = {
         setup: [
           'Confirm power plan, load calculations and generator positions with the site electrician.',
           'Position generators on level ground with drip trays, fencing, signage and a fire extinguisher.',
-          'Lay cable runs along agreed routes, fitting cable ramps at all pedestrian and vehicle crossings.',
-          'Connect distribution boards and final circuits; electrician to inspect, test and certify before energising.'
+          'Lay cable along the routes on the site plan (fence lines and backs of structures), fully unwinding drums.',
+          'Fit yellow-lidded pedestrian protectors at walkway crossings and vehicle-rated protectors (or a flown cable bridge) at vehicle crossings; butt sections together and tape the ends.',
+          'Keep CEE-form connectors off the ground on stands or in IP-rated boxes.',
+          'Connect distribution boards and final circuits, with a 30 mA RCD on every final circuit.',
+          'Electrician to test earthing, loop impedance and every RCD trip time, and issue the BS 7909 certificate before anything is energised.'
         ],
         during: [
           'Electrician on site or on call for the duration of the event.',
+          'Press the test button on every RCD at the start of each day and log the result.',
           'Monitor generator fuel levels and refuel only when the generator is stopped and cool.',
-          'Check cable runs and ramps for damage or displacement at regular intervals.'
+          'Check every cable crossing at each site walk and after each delivery window; reseat ramps and re-tape ends.'
         ],
         packdown: [
           'Electrician to isolate and confirm all circuits are dead before disconnection begins.',
@@ -142,6 +182,14 @@ window.RAMS_DATA = {
           controls: 'Stage erected by trained crew to manufacturer instructions and engineer’s design; ground bearing checked; legs on base plates or sole boards; structure checked and signed off by competent person before use.',
           rating: 'medium',
           actions: 'Obtain structural calculations and handover certificate for the stage.'
+        },
+        {
+          hazard: 'Wind loading on stage roof, side wings, banners and flown PA (outdoor stages)',
+          who: 'Crew, performers, {public}',
+          controls: 'Stage roof and any PA wings or banner frames erected to the engineer\'s design, with ballast of the specified weight and position on every leg or ballast point, and guy wires tensioned as specified. Scrim, banners and backdrops fitted only where the design allows for their wind load, with quick-release fixings or cut-away points so they can be removed fast. The operations manual sets the wind speeds for removing scrim, lowering flown PA and stopping the show, and these go on the wind action plan.',
+          rating: 'medium',
+          actions: 'Name who removes the scrim and lowers the PA at the amber trigger, and keep the tools they need at the stage.',
+          outdoor: true
         },
         {
           hazard: 'Falls from stage edges or unguarded openings',
@@ -186,9 +234,9 @@ window.RAMS_DATA = {
         {
           hazard: 'Structure collapse or uplift in high winds',
           who: 'Crew, {public}',
-          controls: 'Structure supplied and erected to BS EN 13782 by a competent contractor (e.g. MUTA member); anchoring or ballast to design calculations; wind speed monitored with defined evacuation and closure limits.',
+          controls: 'Structure supplied and erected to BS EN 13782 by a competent contractor (e.g. MUTA member), with a stated maximum design wind speed. Stakes of the length, number and spacing given in the design calculations, or ballast of the stated weight per leg where staking is not possible (hard standing, buried services). Stakes checked for lift and ratchet straps for tension after erection and each morning. Walls and doors kept fully closed on the windward side in strong winds so wind cannot get under the roof; walls never removed on one side only. At the amber trigger speed: close all walls and doors and stop people entering. At the red trigger speed: evacuate the structure to the agreed assembly point.',
           rating: 'medium',
-          actions: 'Obtain the structure’s design calculations, wind limits and handover certificate before use.'
+          actions: 'Get the structure\'s design calculations, maximum wind speed and handover certificate before use, and enter its trigger speeds on the wind action plan.'
         },
         {
           hazard: 'Striking underground services when staking',
@@ -239,11 +287,18 @@ window.RAMS_DATA = {
       short: 'Heras fencing, pedestrian barriers and crowd barriers',
       hazards: [
         {
-          hazard: 'Fence panels blown over by wind',
-          who: 'Crew, {public}',
-          controls: 'Panels secured with couplers, feet and stabilisers at regular intervals; ballast or bracing added in exposed areas; scrim or banners avoided unless design accounts for wind loading.',
+          hazard: 'Temporary (Heras-type) fence lines blown over by wind, falling onto people',
+          who: 'Crew, stewards, {public}',
+          controls: 'Every panel sits in a rubber or concrete foot. Panels joined with a coupler at top and bottom of every joint, bolts facing the secure side. Unclad runs: a stabiliser stay with its own ballast foot (or pinned) at least every 4th panel, and at every end, corner, gate post and change of direction. Runs with scrim, mesh or branding: stay and ballast on every panel, or as the supplier\'s wind-loading guidance requires, because clad fencing acts as a sail. Extra ballast blocks added on exposed or elevated fence lines.',
           rating: 'medium',
-          actions: 'Check fence lines after high winds and before public access.'
+          actions: 'Get the fence supplier\'s wind-loading guidance before fitting any scrim or banners. Record the wind speed at which scrim is cut or dropped on the wind action plan.'
+        },
+        {
+          hazard: 'Fence or barrier anchoring failing on soft ground, slopes or hard standing',
+          who: 'Crew, {public}',
+          controls: 'Stays pinned with ground stakes on grass where the CAT scan shows no services, and ballasted with extra blocks on hard standing or where staking is not allowed. Feet placed level; on slopes, feet packed level and stays fitted on the downhill side. Water-filled barriers filled to the marked level and checked daily for leaks. Water-filled barriers are not used to stop vehicles unless they are crash-rated for that purpose.',
+          rating: 'low',
+          actions: 'Walk every fence line after heavy rain, high winds or vehicle movements and re-level or re-ballast as needed.'
         },
         {
           hazard: 'Cuts, pinches and strains when handling panels',
@@ -255,7 +310,7 @@ window.RAMS_DATA = {
         {
           hazard: 'Crowd pressure on barriers or blocked emergency exits',
           who: '{public}, stewards',
-          controls: 'Barrier type suited to expected crowd loading; emergency gates in fence lines kept clear and staffed; layout agreed with event safety officer.',
+          controls: 'Front-of-stage and other crowd barriers are engineered systems (not pedestrian barriers or Heras fencing) rated for the crowd load in the barrier design, with the base plate on the crowd side. Pedestrian barriers interlocked along their full length and used only for queue lines and low-density areas. Emergency gates in fence lines marked, kept clear on both sides and staffed or monitored. Layout agreed with the event safety officer.',
           rating: 'medium',
           actions: 'Confirm barrier plan and exit gates against the event management plan.'
         }
@@ -264,11 +319,15 @@ window.RAMS_DATA = {
         setup: [
           'Mark out fence and barrier lines from the site plan, including emergency gates.',
           'Deliver panels by vehicle as close as practicable to the fence line.',
-          'Place feet, then panels, fixing couplers top and bottom; fit stabilisers at regular intervals.',
+          'CAT scan stay positions before any stakes go into the ground.',
+          'Place feet, then panels, fixing couplers at the top and bottom of every joint.',
+          'Fit stabiliser stays with ballast or stakes at least every 4th panel, every panel on clad runs, and at all ends, corners and gates.',
+          'Fit scrim or banners only after the bracing is complete and only to the supplier\'s wind-loading guidance.',
           'Install crowd barriers, check alignment and make sure emergency gates open freely.'
         ],
         during: [
-          'Patrol fence lines and repair any damage or gaps.',
+          'Patrol fence lines and repair any damage, gaps or missing couplers.',
+          'Act on the wind action plan: cut or drop scrim at its trigger speed.',
           'Keep emergency gates clear and staffed or monitored.'
         ],
         packdown: [
@@ -295,6 +354,14 @@ window.RAMS_DATA = {
           controls: 'All lifting equipment inspected and certified under LOLER; pre-use checks carried out; hoists operated only by trained crew.',
           rating: 'low',
           actions: 'Check certification dates before use and quarantine any out-of-date items.'
+        },
+        {
+          hazard: 'Wind loading on outdoor ground-support towers, flown PA, screens and truss banners',
+          who: 'Crew, performers, {public}',
+          controls: 'Ground-support towers ballasted and guyed as set in the supplier\'s calculations for the actual load hung, including any LED screen or banner, which add wind load. Outrigger feet on spreader plates. Banners on truss fitted with wind slits or quick-release fixings. Flown PA lowered to the deck and screens taken down at the speeds the operations manual gives.',
+          rating: 'medium',
+          actions: 'Enter the tower and screen trigger speeds on the wind action plan.',
+          outdoor: true
         },
         {
           hazard: 'Noise-induced hearing damage during sound checks and performances',
@@ -336,11 +403,25 @@ window.RAMS_DATA = {
       short: 'Deliveries, forklifts, telehandlers and site vehicles',
       hazards: [
         {
-          hazard: 'People struck by moving vehicles or plant',
+          hazard: 'Pedestrians struck by vehicles or plant on shared site routes',
           who: 'Crew, contractors, {public}',
-          controls: 'Traffic management plan in place; pedestrians and vehicles segregated; 5mph site speed limit; trained banksmen for all reversing; hi-vis worn by everyone in vehicle areas.',
+          controls: 'Traffic management plan with a site map showing separate vehicle routes and pedestrian walkways. Walkways separated from vehicle routes by physical barriers (pedestrian barriers or Heras fencing), not tape or cones alone. Pedestrian and vehicle gates are separate; where the two must cross, a marked crossing point with signs on both approaches and drivers giving way. One-way vehicle loop wherever the site allows, to cut out reversing. 5 mph (8 km/h) site speed limit signed at every vehicle entrance. Routes lit for work after dark.',
           rating: 'medium',
-          actions: 'Brief all drivers on the traffic management plan when they arrive on site.'
+          actions: 'Issue the site map to all suppliers with their delivery slot. Gate staff brief every driver on arrival: route, speed limit, crossing points and where to park.'
+        },
+        {
+          hazard: 'People struck or crushed during reversing and manoeuvring in loading areas',
+          who: 'Crew, drivers, banksmen',
+          controls: 'All reversing and manoeuvring in loading areas controlled by a trained banksman in hi-vis, using agreed hand signals and standing where the driver can see them at all times. If the driver loses sight of the banksman, they stop. Loading bays marked as vehicle-only zones: crew stay behind the barrier line until the vehicle has stopped, the engine is off and the handbrake is on. Drivers wait in the cab or in a marked safe area while being loaded or unloaded.',
+          rating: 'medium',
+          actions: 'Name the banksmen for each delivery window on the crew sheet.'
+        },
+        {
+          hazard: 'People struck by forklifts or telehandlers moving or lifting loads',
+          who: 'Crew, {public}',
+          controls: 'Exclusion zone of at least the machine\'s full reach (or as set by the lift plan) coned and barriered around plant while it lifts; no one walks under a raised load. Plant fitted with a working beacon and reversing alarm. Forks lowered and machine parked in a designated area when not in use, with keys removed.',
+          rating: 'medium',
+          actions: 'Crew chief to check daily pre-use checks are recorded for each machine.'
         },
         {
           hazard: 'Overturning of plant or vehicles on soft or uneven ground',
@@ -352,7 +433,7 @@ window.RAMS_DATA = {
         {
           hazard: 'Vehicle movements during public access',
           who: '{public}',
-          controls: 'No vehicle movements while public are on site, except emergency vehicles or under escort with a steward.',
+          controls: 'Vehicle curfew while the public are on site. Any essential movement (and all emergency vehicle access) is at walking pace, hazard lights on, with a steward in hi-vis walking ahead to clear the route. Emergency vehicle routes kept clear and marked on the site map.',
           rating: 'low',
           actions: 'Set up vehicle curfew times and communicate them to all suppliers.'
         }
@@ -360,12 +441,13 @@ window.RAMS_DATA = {
       method: {
         setup: [
           'Issue the traffic management plan and delivery schedule to all suppliers.',
-          'Set up vehicle routes, signage, speed limits and pedestrian segregation.',
+          'Install barriers between walkways and vehicle routes, separate pedestrian and vehicle gates, marked crossing points and 5 mph signs before the first delivery arrives.',
           'Lay trackway where ground conditions require it.',
-          'Check plant operator certification on arrival; banksman to control all reversing and manoeuvres.'
+          'Check plant operator certification on arrival; banksman to control all reversing and manoeuvres.',
+          'Coned and barriered exclusion zone around plant while it lifts; no one under a raised load.'
         ],
         during: [
-          'Enforce vehicle curfew; any essential movement only under escort with hazard lights on.',
+          'Enforce the vehicle curfew; any essential movement at walking pace, hazard lights on, with a steward walking ahead.',
           'Keep emergency vehicle routes clear at all times.'
         ],
         packdown: [
@@ -397,9 +479,17 @@ window.RAMS_DATA = {
         {
           hazard: 'Unstable access equipment or poor ground conditions',
           who: 'Crew',
-          controls: 'Equipment set up on firm level ground; outriggers and stabilisers deployed; pre-use inspections carried out and recorded; ladders used only for short-duration, low-risk work.',
+          controls: 'Equipment set up on firm level ground; outriggers and stabilisers deployed on spreader pads; pre-use inspections carried out and recorded; ladders used only for short-duration, low-risk work.',
           rating: 'low',
-          actions: 'Stop work at height in high winds according to manufacturer limits.'
+          actions: 'None beyond existing controls.'
+        },
+        {
+          hazard: 'MEWP or tower overturning, or operator thrown from the platform, in wind',
+          who: 'Operators, crew, {public}',
+          controls: 'MEWPs not operated above the maximum wind speed on the machine\'s data plate (commonly 12.5 m/s, about 28 mph, for outdoor-rated machines; indoor-only machines not used outdoors at all). Mobile towers used outdoors only within the manufacturer\'s wind limit, with stabilisers fitted and ballast if the manual requires it; towers tied in or taken down if the forecast exceeds the limit. Wind read at platform height with a handheld anemometer before going up and while working. No sheeting or banners carried on a platform in wind.',
+          rating: 'medium',
+          actions: 'Operators record the wind reading on the pre-use check sheet before each use.',
+          outdoor: true
         }
       ],
       method: {
@@ -462,6 +552,41 @@ window.RAMS_DATA = {
       }
     }
   },
+
+  /* Wind action plan rows, shown for outdoor events when the matching activity is ticked.
+     Speeds are left blank: they must come from each structure's own design figures. */
+  windPlan: [
+    {
+      activity: 'marquee',
+      structure: 'Marquee / tent',
+      amber: 'Close all walls and doors; stop people entering; check stakes and straps.',
+      red: 'Evacuate the structure to the assembly point; keep everyone clear of guy lines.'
+    },
+    {
+      activity: 'staging',
+      structure: 'Stage roof, wings and banners',
+      amber: 'Remove scrim and backdrops; prepare to lower flown PA; brief performers.',
+      red: 'Stop the show; lower PA; clear the stage and the area in front of it.'
+    },
+    {
+      activity: 'rigging',
+      structure: 'Ground-support towers, flown PA and screens',
+      amber: 'Remove truss banners; prepare to lower PA and screens.',
+      red: 'Lower PA and screens to the deck; set an exclusion zone around the towers.'
+    },
+    {
+      activity: 'fencing',
+      structure: 'Fence lines with scrim or branding',
+      amber: 'Add ballast at exposed runs; prepare to cut or drop scrim.',
+      red: 'Cut or drop all scrim; move people away from clad fence lines.'
+    },
+    {
+      activity: 'height',
+      structure: 'MEWPs and mobile towers',
+      amber: 'Finish the current task and bring the platform down.',
+      red: 'No work at height; MEWPs stowed; towers tied in or dismantled.'
+    }
+  ],
 
   /* General method steps wrapped around the activity-specific ones. */
   method: {
