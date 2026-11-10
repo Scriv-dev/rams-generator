@@ -30,5 +30,5 @@ window.RAMS_CONFIG = {
   // Visitor counter. Create a site at https://www.goatcounter.com and paste its
   // code here: the 'mysite' in https://mysite.goatcounter.com.
   // No cookies are used. Leave blank to turn counting off.
-  goatcounterCode: ''
+  goatcounterCode: 'scriv-dev'
 };
