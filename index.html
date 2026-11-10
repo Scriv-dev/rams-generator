@@ -4,116 +4,164 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>RAMS Generator</title>
-  <meta name="description" content="Generate Risk Assessment and Method Statement (RAMS) documents for UK event setups.">
+  <meta name="description" content="Draft Risk Assessments and Method Statements for UK event setups in minutes. Built for event companies, production crews and site contractors.">
   <meta name="theme-color" content="#1f3a5f">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="landing.css">
 </head>
-<body>
-  <header class="app-header no-print">
-    <div class="wrap">
-      <h1>RAMS Generator</h1>
-      <p>Risk Assessment &amp; Method Statement for UK event setups</p>
+<body class="landing">
+  <header class="site-header">
+    <div class="wrap site-header-inner">
+      <a class="brand" href="index.html">RAMS Generator</a>
+      <a class="btn btn-light btn-small" href="app.html">Open the generator</a>
     </div>
   </header>
 
-  <main class="wrap">
-    <section id="saved-section" class="card no-print" aria-labelledby="saved-heading">
-      <div class="saved-head">
-        <h2 id="saved-heading">Saved RAMS</h2>
-        <span id="saved-count" class="saved-count"></span>
+  <main>
+    <section class="hero">
+      <div class="wrap hero-inner">
+        <div class="hero-copy">
+          <p class="eyebrow">For UK event companies</p>
+          <h1>Draft your event RAMS in minutes, not evenings</h1>
+          <p class="lede">Enter the event details, tick what's happening on site, and get a structured Risk Assessment and Method Statement ready to check, edit and print. Covers power, staging, marquees, fencing, rigging, vehicles, work at height and manual handling.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary btn-large" href="app.html">Start a RAMS</a>
+            <a class="btn btn-ghost btn-large" href="#how-it-works">See how it works</a>
+          </div>
+          <p class="hero-note">Free. No sign-up. Works on your phone. Your data stays in your browser.</p>
+        </div>
+
+        <figure class="excerpt" aria-label="Example excerpt from a generated risk assessment">
+          <figcaption>
+            <span class="excerpt-kicker">3.2 Power distribution</span>
+            <span class="excerpt-sub">Excerpt from a generated RAMS</span>
+          </figcaption>
+          <dl class="excerpt-row">
+            <div><dt>Hazard</dt><dd>Electric shock from an earth fault on a final circuit</dd></div>
+            <div><dt>Who might be harmed</dt><dd>Electricians, crew, performers, festival-goers</dd></div>
+            <div><dt>Existing controls</dt><dd>Every final circuit on a 30 mA RCD; time-delayed 100 mA or 300 mA RCDs upstream; trip times recorded on the BS 7909 certificate.</dd></div>
+            <div class="excerpt-split">
+              <div><dt>Risk rating</dt><dd><span class="rating rating-medium">Medium</span></dd></div>
+              <div><dt>Further actions</dt><dd>Press the RCD test button on every distro each morning and log it.</dd></div>
+            </div>
+          </dl>
+        </figure>
       </div>
-      <p id="saved-empty" class="hint">Nothing saved yet. Generate a RAMS and tap <strong>Save RAMS</strong> to keep it here.</p>
-      <ul id="saved-list" class="saved-list"></ul>
-      <p id="storage-error" class="error" role="alert" hidden></p>
-      <p class="hint saved-note">Saved RAMS are stored only in this browser on this device. Clearing your browser data deletes them.</p>
     </section>
 
-    <form id="rams-form" class="card no-print" novalidate>
-      <div id="editing-banner" class="banner" hidden>
-        <p>You're editing the saved RAMS <strong id="editing-name"></strong>. Generating again rebuilds the document from these details, replacing any text you changed in the document itself.</p>
-        <button type="button" id="new-btn" class="btn btn-ghost btn-small">Start a new RAMS instead</button>
+    <section class="band" aria-labelledby="who-heading">
+      <div class="wrap">
+        <h2 id="who-heading">Who it's for</h2>
+        <p class="section-lede">Anyone in the UK who has to hand a venue, client or safety officer a RAMS before they're allowed on site.</p>
+        <ul class="audience">
+          <li>
+            <h3>Event and production companies</h3>
+            <p>Festivals, corporate events, weddings and outdoor shows, with a consistent RAMS for every job.</p>
+          </li>
+          <li>
+            <h3>Site contractors</h3>
+            <p>Staging, marquee, fencing, power and rigging crews who need method statements for their part of the build.</p>
+          </li>
+          <li>
+            <h3>Small teams and freelancers</h3>
+            <p>Crew chiefs and production managers without a health and safety department to write documents for them.</p>
+          </li>
+          <li>
+            <h3>Venue and event managers</h3>
+            <p>A clear structure to compare against the RAMS suppliers send you, or a starting point for your own.</p>
+          </li>
+        </ul>
       </div>
+    </section>
 
-      <h2>1. Event details</h2>
-      <div class="grid">
-        <label class="field">
-          <span>Event name <em>*</em></span>
-          <input type="text" name="eventName" required autocomplete="off" placeholder="e.g. Summer Garden Party">
-        </label>
-        <label class="field">
-          <span>Event date <em>*</em></span>
-          <input type="date" name="eventDate" required>
-        </label>
-        <label class="field">
-          <span>Venue <em>*</em></span>
-          <input type="text" name="venue" required autocomplete="off" placeholder="e.g. Hyde Park, London">
-        </label>
-        <label class="field">
-          <span>Client <em>*</em></span>
-          <input type="text" name="client" required autocomplete="off" placeholder="e.g. Acme Ltd">
-        </label>
-        <label class="field">
-          <span>Event type <em>*</em></span>
-          <select name="eventType" required>
-            <option value="">Choose…</option>
-            <option value="festival">Festival</option>
-            <option value="corporate">Corporate event</option>
-            <option value="wedding">Wedding</option>
-            <option value="outdoor">Outdoor show</option>
-          </select>
-        </label>
-        <label class="field">
-          <span>Prepared by <small>(optional)</small></span>
-          <input type="text" name="preparedBy" autocomplete="name" placeholder="Name and company">
-        </label>
+    <section id="how-it-works" class="band band-alt" aria-labelledby="how-heading">
+      <div class="wrap">
+        <h2 id="how-heading">How it works</h2>
+        <ol class="steps-row">
+          <li>
+            <h3>Enter the event</h3>
+            <p>Event name, date, venue, client and type: festival, corporate, wedding or outdoor show.</p>
+          </li>
+          <li>
+            <h3>Tick the activities</h3>
+            <p>Choose what's happening on site, from power distribution to vehicle movements.</p>
+          </li>
+          <li>
+            <h3>Check and edit</h3>
+            <p>Read every section. Tap any text to change it and tap a rating to adjust it.</p>
+          </li>
+          <li>
+            <h3>Save and print</h3>
+            <p>Save it in your browser to reopen later, then print it or save it as a PDF for sign-off.</p>
+          </li>
+        </ol>
       </div>
+    </section>
 
-      <h2>2. Activities</h2>
-      <p class="hint">Tick every activity that applies to this event.</p>
-      <div id="activity-list" class="activities"></div>
-
-      <h2>3. Sign-off</h2>
-      <div class="grid">
-        <label class="field field-wide">
-          <span>Staff names <small>(optional, one per line)</small></span>
-          <textarea name="staff" rows="4" placeholder="Jane Smith – Crew Chief&#10;Tom Jones – Rigger"></textarea>
-        </label>
-        <label class="field">
-          <span>Extra blank signature rows</span>
-          <input type="number" name="blankRows" min="0" max="40" value="6" inputmode="numeric">
-        </label>
-      </div>
-
-      <p id="form-error" class="error" role="alert" hidden></p>
-
-      <div class="actions">
-        <button type="submit" class="btn btn-primary">Generate RAMS</button>
-        <button type="button" id="reset-btn" class="btn btn-ghost">Clear form</button>
-      </div>
-    </form>
-
-    <section id="output" hidden>
-      <div class="toolbar no-print">
-        <p class="hint">Tip: click any text in the document to edit it, and tap a risk rating to change it. Save to keep your changes.</p>
-        <div class="actions">
-          <button type="button" id="save-btn" class="btn btn-primary">Save RAMS</button>
-          <button type="button" id="print-btn" class="btn btn-secondary">Print / Save as PDF</button>
-          <button type="button" id="edit-btn" class="btn btn-ghost">Edit details</button>
-          <button type="button" id="list-btn" class="btn btn-ghost">Saved RAMS</button>
+    <section class="band" aria-labelledby="whats-in-heading">
+      <div class="wrap two-col">
+        <div>
+          <h2 id="whats-in-heading">What's in the document</h2>
+          <ul class="checklist">
+            <li><strong>Scope</strong> of the work, the event and the legislation referenced</li>
+            <li><strong>Risk assessments</strong> for each activity: hazard, who might be harmed, existing controls, low / medium / high rating and further actions</li>
+            <li><strong>Method statement</strong> with numbered steps for setup, during the event and pack-down</li>
+            <li><strong>PPE list</strong> matched to the activities you ticked</li>
+            <li><strong>Wind action plan</strong> for outdoor structures, with amber and red actions</li>
+            <li><strong>Emergency arrangements</strong> to fill in for the site</li>
+            <li><strong>Sign-off sheet</strong> for crew names and signatures, plus approval</li>
+          </ul>
         </div>
-        <p id="save-status" class="save-status" role="status" aria-live="polite"></p>
+        <div>
+          <h2>Written for UK sites</h2>
+          <p>Controls are specific, not generic: 30 mA RCDs, IP44 CEE-form connectors, ballasted fence stays every 4th panel, banksman rules, and MEWP wind limits read at platform height.</p>
+          <p>The content refers to:</p>
+          <ul class="refs">
+            <li>Health and Safety at Work etc. Act 1974</li>
+            <li>Management of Health and Safety at Work Regulations 1999</li>
+            <li>CDM Regulations 2015</li>
+            <li>Work at Height Regulations 2005</li>
+            <li>LOLER 1998</li>
+            <li>Manual Handling Operations Regulations 1992</li>
+            <li>BS 7909 and BS 7671</li>
+            <li>BS EN 13782</li>
+            <li>The Purple Guide</li>
+          </ul>
+        </div>
       </div>
-      <article id="document" class="doc"></article>
+    </section>
+
+    <section class="band band-alt" aria-labelledby="privacy-heading">
+      <div class="wrap">
+        <h2 id="privacy-heading">Your data stays on your device</h2>
+        <p class="section-lede">There's no account and no server. Everything you type, and every RAMS you save, is stored only in the browser you're using. Nothing is uploaded. That also means saved RAMS don't sync between devices, and clearing your browser data deletes them.</p>
+      </div>
+    </section>
+
+    <section id="disclaimer" class="band" aria-labelledby="disclaimer-heading">
+      <div class="wrap">
+        <div class="disclaimer">
+          <h2 id="disclaimer-heading">Disclaimer</h2>
+          <p><strong>Every RAMS this tool produces is a draft.</strong> It is a starting point based on common UK event practice, not a finished safety document.</p>
+          <p>Before work starts, a competent person must check it, adapt it to the specific site, venue, contractors and event, and approve it. Wind speeds, load ratings and other figures must come from your own suppliers' design calculations and manuals.</p>
+          <p>Using this tool does not replace your duty to carry out a suitable and sufficient risk assessment under the Management of Health and Safety at Work Regulations 1999. The authors accept no liability for how generated documents are used.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="band cta-band">
+      <div class="wrap cta-inner">
+        <h2>Ready to draft your next RAMS?</h2>
+        <a class="btn btn-light btn-large" href="app.html">Start a RAMS</a>
+      </div>
     </section>
   </main>
 
-  <footer class="app-footer no-print">
-    <div class="wrap">
-      <p>Generated content is a starting template. It must be reviewed by a competent person and adapted to the specific site, venue and event before use.</p>
+  <footer class="app-footer">
+    <div class="wrap footer-inner">
+      <p>RAMS Generator. Drafts for UK event setups, to be checked by a competent person.</p>
+      <p><a href="app.html">Open the generator</a> · <a href="#disclaimer">Disclaimer</a></p>
     </div>
   </footer>
-
-  <script src="data.js"></script>
-  <script src="app.js"></script>
 </body>
 </html>

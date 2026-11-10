@@ -47,6 +47,10 @@ body {
 }
 .app-header h1 { margin: 0; font-size: 1.5rem; letter-spacing: -0.01em; }
 .app-header p { margin: 2px 0 0; opacity: 0.85; font-size: 0.95rem; }
+.app-header-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
+.app-header-link { color: var(--brand-ink); font-weight: 600; font-size: 0.92rem; text-underline-offset: 3px; }
+.app-header-link:hover { opacity: 0.85; }
+.app-footer a { color: inherit; text-underline-offset: 2px; }
 
 .app-footer {
   color: var(--muted);
