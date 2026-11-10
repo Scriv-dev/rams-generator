@@ -396,7 +396,11 @@
     var action = el.dataset.acct;
     if (action === 'signin') return openSignin();
     if (action === 'menu') { menuOpen = !menuOpen; return renderSlot(); }
-    if (action === 'upgrade') { menuOpen = false; return goToStripe('create-checkout-session', el); }
+    if (action === 'upgrade') {
+      menuOpen = false;
+      if (window.RamsStats) window.RamsStats.event('pro-upgrade-click');
+      return goToStripe('create-checkout-session', el);
+    }
     if (action === 'portal') { menuOpen = false; return goToStripe('create-portal-session', el); }
     if (action === 'import') return importLocal(el);
     if (action === 'view-account') { viewingAccount = true; return update(); }

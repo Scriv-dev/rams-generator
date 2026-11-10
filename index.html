@@ -171,6 +171,7 @@
         <h2 id="privacy-heading">Where your data is kept</h2>
         <p class="section-lede"><strong>Without an account,</strong> everything you type and every RAMS you save stays in the browser you're using. Nothing is uploaded, so saved RAMS don't sync between devices, and clearing your browser data deletes them.</p>
         <p class="section-lede"><strong>With Pro,</strong> the RAMS you save are stored in your account so you can open them anywhere you sign in. Only you can see them. Payments are handled by Stripe; we never see your card details.</p>
+        <p class="section-lede"><strong>Visitor numbers</strong> are counted without cookies and without collecting personal data. If your browser sends a Do Not Track signal, you aren't counted at all.</p>
       </div>
     </section>
 
@@ -185,6 +186,16 @@
       </div>
     </section>
 
+    <section class="band band-alt feedback-band" data-feedback-prompt hidden aria-labelledby="feedback-heading">
+      <div class="wrap feedback-band-inner">
+        <div>
+          <h2 id="feedback-heading">Something missing?</h2>
+          <p class="section-lede">Tell us which activities, hazards or features you need. It takes 30 seconds, and it shapes what gets built next.</p>
+        </div>
+        <button type="button" class="btn btn-primary btn-large" data-feedback>Send feedback</button>
+      </div>
+    </section>
+
     <section class="band cta-band">
       <div class="wrap cta-inner">
         <h2>Ready to draft your next RAMS?</h2>
@@ -196,11 +207,13 @@
   <footer class="app-footer">
     <div class="wrap footer-inner">
       <p>RAMS Generator. Drafts for UK event setups, to be checked by a competent person.</p>
-      <p><a href="app.html">Open the generator</a> · <a href="#disclaimer">Disclaimer</a></p>
+      <p><a href="app.html">Open the generator</a> · <a href="#disclaimer">Disclaimer</a><span data-feedback-prompt hidden> · <a href="#" data-feedback>Send feedback</a></span></p>
     </div>
   </footer>
 
   <script src="config.js"></script>
+  <script src="stats.js"></script>
+  <script src="feedback.js"></script>
   <script>
     /* Show the Pro price once accounts are set up in config.js. */
     (function () {
