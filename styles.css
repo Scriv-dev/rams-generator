@@ -414,6 +414,8 @@ button.rating { cursor: pointer; }
   .meta-table tbody { display: table-row-group !important; }
   .meta-table tr { display: table-row !important; }
 
+  /* Keep the right-hand table border inside the printable area. */
+  .doc table { width: calc(100% - 2px); margin-left: 1px; }
   thead { display: table-header-group; }
   tr, li { break-inside: avoid; page-break-inside: avoid; }
   h2, h3, h4 { break-after: avoid; page-break-after: avoid; }
