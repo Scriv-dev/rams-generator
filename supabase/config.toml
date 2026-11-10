@@ -1,0 +1,8 @@
+# Supabase CLI settings for the RAMS Generator.
+# Run `supabase link --project-ref <your-project-ref>` before deploying.
+project_id = "rams-generator"
+
+# Stripe calls this function directly and can't send a Supabase login token,
+# so JWT verification is off. The function checks Stripe's signature instead.
+[functions.stripe-webhook]
+verify_jwt = false

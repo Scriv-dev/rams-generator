@@ -319,24 +319,35 @@
 
   doc.addEventListener('input', markDirty);
 
-  /* ---------- Saved RAMS (stored in this browser) ---------- */
+  /* ---------- Saved RAMS ----------
+   * Saving goes through a "store" with async list/get/put/remove.
+   * The browser store (localStorage) is the default; account.js swaps in the
+   * account store when a Pro user signs in, via window.RamsApp.setStore().
+   * Records: { id, title, values, html, createdAt, updatedAt } (times in ms).
+   */
 
   var SAVED_KEY = 'rams-generator:saved';
   var savedSection = document.getElementById('saved-section');
   var savedList = document.getElementById('saved-list');
   var savedEmpty = document.getElementById('saved-empty');
   var savedCount = document.getElementById('saved-count');
+  var savedWhere = document.getElementById('saved-where');
+  var savedNote = document.getElementById('saved-note');
   var storageError = document.getElementById('storage-error');
   var saveBtn = document.getElementById('save-btn');
   var saveStatus = document.getElementById('save-status');
   var editingBanner = document.getElementById('editing-banner');
   var editingName = document.getElementById('editing-name');
 
-  var currentId = null;   // id of the saved RAMS being viewed/edited, or null for a new one
+  var currentId = null;        // id of the saved RAMS on screen, or null if not saved
+  var currentTitle = '';
+  var currentCreatedAt = null;
+  var currentSavedAt = null;
   var currentValues = null;
   var dirty = false;
+  var busy = false;
 
-  function loadAll() {
+  function readLocal() {
     try {
       var list = JSON.parse(localStorage.getItem(SAVED_KEY) || '[]');
       return Array.isArray(list) ? list : [];
@@ -345,13 +356,44 @@
     }
   }
 
-  function storeAll(list) {
-    localStorage.setItem(SAVED_KEY, JSON.stringify(list));
+  function writeLocal(list) {
+    try {
+      localStorage.setItem(SAVED_KEY, JSON.stringify(list));
+    } catch (e) {
+      throw new Error('This browser’s storage is full or blocked. Delete some saved RAMS and try again.');
+    }
   }
 
-  function findSaved(id) {
-    return loadAll().filter(function (r) { return r.id === id; })[0] || null;
-  }
+  var localStore = {
+    kind: 'local',
+    where: 'In this browser',
+    savedText: 'Saved in this browser',
+    note: 'Saved RAMS are stored only in this browser on this device. Clearing your browser data deletes them.',
+    list: function () {
+      return Promise.resolve(readLocal().map(function (r) {
+        return { id: r.id, title: r.title, values: r.values, createdAt: r.createdAt, updatedAt: r.updatedAt };
+      }));
+    },
+    get: function (id) {
+      return Promise.resolve(readLocal().filter(function (r) { return r.id === id; })[0] || null);
+    },
+    put: function (record) {
+      return new Promise(function (resolve) {
+        var list = readLocal().filter(function (r) { return r.id !== record.id; });
+        list.push(record);
+        writeLocal(list);
+        resolve(record);
+      });
+    },
+    remove: function (id) {
+      return new Promise(function (resolve) {
+        writeLocal(readLocal().filter(function (r) { return r.id !== id; }));
+        resolve();
+      });
+    }
+  };
+
+  var store = localStore;
 
   function newId() {
     return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
@@ -368,8 +410,12 @@
   }
 
   function showStorageError(msg) {
-    storageError.textContent = msg;
+    storageError.textContent = msg || '';
     storageError.hidden = !msg;
+  }
+
+  function errorText(err) {
+    return (err && err.message) ? err.message : 'Something went wrong. Please try again.';
   }
 
   /* Strip anything executable from stored HTML before putting it back into the page. */
@@ -386,22 +432,23 @@
     return tpl.innerHTML;
   }
 
+  function setStatus(text, kind) {
+    saveStatus.textContent = text;
+    saveStatus.className = 'save-status' + (kind ? ' is-' + kind : '');
+  }
+
   function updateSaveUI() {
     saveBtn.textContent = currentId ? 'Save changes' : 'Save RAMS';
+    saveBtn.disabled = busy || store.disabled === true;
     if (dirty) {
-      saveStatus.textContent = currentId ? 'Unsaved changes' : 'Not saved yet';
-      saveStatus.className = 'save-status is-dirty';
-    } else if (currentId) {
-      var rec = findSaved(currentId);
-      saveStatus.textContent = rec ? 'Saved in this browser at ' + formatTime(rec.updatedAt) : '';
-      saveStatus.className = 'save-status is-saved';
+      setStatus(currentId ? 'Unsaved changes' : 'Not saved yet', 'dirty');
+    } else if (currentId && currentSavedAt) {
+      setStatus(store.savedText + ' at ' + formatTime(currentSavedAt), 'saved');
     } else {
-      saveStatus.textContent = '';
-      saveStatus.className = 'save-status';
+      setStatus('', '');
     }
-    var rec2 = currentId && findSaved(currentId);
-    editingBanner.hidden = !rec2;
-    if (rec2) editingName.textContent = rec2.title;
+    editingBanner.hidden = !currentId;
+    editingName.textContent = currentTitle;
   }
 
   function markDirty() {
@@ -416,8 +463,7 @@
   }
 
   function saveCurrent() {
-    if (!currentValues) return;
-    var list = loadAll();
+    if (!currentValues || busy) return;
     var now = Date.now();
     var record = {
       version: 1,
@@ -425,79 +471,108 @@
       title: currentValues.eventName,
       values: currentValues,
       html: doc.innerHTML,
-      createdAt: now,
+      createdAt: currentCreatedAt || now,
       updatedAt: now
     };
-    var idx = -1;
-    list.forEach(function (r, i) { if (r.id === record.id) idx = i; });
-    if (idx !== -1) {
-      record.createdAt = list[idx].createdAt || now;
-      list[idx] = record;
-    } else {
-      list.push(record);
-    }
-    try {
-      storeAll(list);
-    } catch (e) {
-      saveStatus.textContent = 'Couldn’t save: this browser’s storage is full or blocked. Delete some saved RAMS and try again.';
-      saveStatus.className = 'save-status is-error';
-      return;
-    }
-    currentId = record.id;
-    setClean();
-    renderSavedList();
+    busy = true;
+    updateSaveUI();
+    setStatus('Saving…', '');
+    store.put(record).then(function () {
+      currentId = record.id;
+      currentTitle = record.title;
+      currentCreatedAt = record.createdAt;
+      currentSavedAt = record.updatedAt;
+      busy = false;
+      setClean();
+      renderSavedList();
+    }, function (err) {
+      busy = false;
+      updateSaveUI();
+      setStatus('Couldn’t save: ' + errorText(err), 'error');
+    });
   }
 
   function deleteSaved(id) {
-    var list = loadAll().filter(function (r) { return r.id !== id; });
-    try {
-      storeAll(list);
-    } catch (e) {
-      showStorageError('Couldn’t delete: this browser is blocking storage.');
-      return;
-    }
-    if (currentId === id) {
-      currentId = null;
-      currentValues = null;
-      dirty = false;
-    }
-    updateSaveUI();
-    renderSavedList();
+    store.remove(id).then(function () {
+      if (currentId === id) {
+        currentId = null;
+        currentTitle = '';
+        currentCreatedAt = null;
+        currentSavedAt = null;
+        currentValues = null;
+        dirty = false;
+      }
+      showStorageError('');
+      updateSaveUI();
+      renderSavedList();
+    }, function (err) {
+      showStorageError('Couldn’t delete: ' + errorText(err));
+      renderSavedList();
+    });
   }
 
   function openSaved(id) {
-    var rec = findSaved(id);
-    if (!rec) return;
-    if (dirty && rec.id !== currentId && !confirm('You have unsaved changes to the current RAMS. Open this one anyway?')) return;
-    currentId = rec.id;
-    currentValues = rec.values;
-    fillForm(rec.values);
-    save(); // keep the form autosave in step with what's on screen
-    doc.innerHTML = cleanHtml(rec.html);
-    makeEditable();
-    showDocument(rec.title);
-    setClean();
+    if (dirty && id !== currentId && !confirm('You have unsaved changes to the current RAMS. Open this one anyway?')) return;
+    store.get(id).then(function (rec) {
+      if (!rec) {
+        showStorageError('That RAMS couldn’t be found. It may have been deleted on another device.');
+        renderSavedList();
+        return;
+      }
+      currentId = rec.id;
+      currentTitle = rec.title;
+      currentCreatedAt = rec.createdAt;
+      currentSavedAt = rec.updatedAt;
+      currentValues = rec.values;
+      fillForm(rec.values);
+      save(); // keep the form autosave in step with what's on screen
+      doc.innerHTML = cleanHtml(rec.html);
+      makeEditable();
+      showStorageError('');
+      showDocument(rec.title);
+      setClean();
+    }, function (err) {
+      showStorageError('Couldn’t open that RAMS: ' + errorText(err));
+    });
   }
 
+  var listRequest = 0;
   function renderSavedList() {
-    var list = loadAll().sort(function (a, b) { return b.updatedAt - a.updatedAt; });
-    savedEmpty.hidden = list.length > 0;
-    savedCount.textContent = list.length ? String(list.length) : '';
-    savedList.innerHTML = list.map(function (r) {
-      var v = r.values || {};
-      var type = DATA.eventTypes[v.eventType];
-      var meta = [formatDate(v.eventDate), v.venue, type && type.label].filter(Boolean).map(esc).join(' · ');
-      return '<li class="saved-item' + (r.id === currentId ? ' is-current' : '') + '" data-id="' + esc(r.id) + '">' +
-        '<div class="saved-info">' +
-        '<strong class="saved-title">' + esc(r.title || 'Untitled RAMS') + '</strong>' +
-        '<span class="saved-meta">' + meta + '</span>' +
-        '<span class="saved-stamp">Last saved ' + esc(formatStamp(r.updatedAt)) + '</span>' +
-        '</div>' +
-        '<div class="saved-actions">' +
-        '<button type="button" class="btn btn-secondary btn-small" data-action="open">Open</button>' +
-        '<button type="button" class="btn btn-danger btn-small" data-action="delete">Delete</button>' +
-        '</div></li>';
-    }).join('');
+    var ticket = ++listRequest;
+    savedWhere.textContent = store.where;
+    savedNote.textContent = store.note;
+    if (store.disabled) {
+      savedList.innerHTML = '';
+      savedEmpty.hidden = true;
+      savedCount.textContent = '';
+      return Promise.resolve();
+    }
+    return store.list().then(function (list) {
+      if (ticket !== listRequest) return; // a newer refresh has started
+      list.sort(function (a, b) { return b.updatedAt - a.updatedAt; });
+      savedEmpty.hidden = list.length > 0;
+      savedCount.textContent = list.length ? String(list.length) : '';
+      savedList.innerHTML = list.map(function (r) {
+        var v = r.values || {};
+        var type = DATA.eventTypes[v.eventType];
+        var meta = [formatDate(v.eventDate), v.venue, type && type.label].filter(Boolean).map(esc).join(' · ');
+        return '<li class="saved-item' + (r.id === currentId ? ' is-current' : '') + '" data-id="' + esc(r.id) + '">' +
+          '<div class="saved-info">' +
+          '<strong class="saved-title">' + esc(r.title || 'Untitled RAMS') + '</strong>' +
+          '<span class="saved-meta">' + meta + '</span>' +
+          '<span class="saved-stamp">Last saved ' + esc(formatStamp(r.updatedAt)) + '</span>' +
+          '</div>' +
+          '<div class="saved-actions">' +
+          '<button type="button" class="btn btn-secondary btn-small" data-action="open">Open</button>' +
+          '<button type="button" class="btn btn-danger btn-small" data-action="delete">Delete</button>' +
+          '</div></li>';
+      }).join('');
+    }, function (err) {
+      if (ticket !== listRequest) return;
+      savedList.innerHTML = '';
+      savedEmpty.hidden = true;
+      showStorageError('Couldn’t load your saved RAMS: ' + errorText(err));
+    });
   }
 
   /* Delete needs a second tap within a few seconds, so a stray tap can't lose work. */
@@ -506,7 +581,10 @@
     if (!btn) return;
     var id = btn.closest('.saved-item').dataset.id;
     if (btn.dataset.action === 'open') return openSaved(id);
-    if (btn.dataset.armed === 'true') return deleteSaved(id);
+    if (btn.dataset.armed === 'true') {
+      btn.disabled = true;
+      return deleteSaved(id);
+    }
     btn.dataset.armed = 'true';
     btn.textContent = 'Tap again to delete';
     setTimeout(function () {
@@ -523,10 +601,32 @@
     }
   });
 
-  /* Keep the list in step if another tab saves or deletes. */
+  /* Keep the list in step if another tab saves or deletes in this browser. */
   window.addEventListener('storage', function (e) {
-    if (e.key === SAVED_KEY) { renderSavedList(); updateSaveUI(); }
+    if (e.key === SAVED_KEY && store.kind === 'local') renderSavedList();
   });
+
+  /* Hooks for account.js. */
+  window.RamsApp = {
+    localStore: localStore,
+    /* Switch where RAMS are saved. The RAMS on screen (if any) is treated as not yet saved there. */
+    setStore: function (next) {
+      if (next === store) return renderSavedList();
+      store = next || localStore;
+      if (currentId) {
+        currentId = null;
+        currentTitle = '';
+        currentCreatedAt = null;
+        currentSavedAt = null;
+        if (currentValues && !output.hidden) dirty = true;
+      }
+      showStorageError('');
+      updateSaveUI();
+      return renderSavedList();
+    },
+    refreshSaved: function () { return renderSavedList(); },
+    newId: newId
+  };
 
   /* ---------- Screens ---------- */
 
@@ -582,6 +682,9 @@
   document.getElementById('new-btn').addEventListener('click', function () {
     if (dirty && !confirm('You have unsaved changes to this RAMS. Start a new one anyway?')) return;
     currentId = null;
+    currentTitle = '';
+    currentCreatedAt = null;
+    currentSavedAt = null;
     currentValues = null;
     dirty = false;
     form.reset();
@@ -607,8 +710,9 @@
     localStorage.setItem(SAVED_KEY + ':probe', '1');
     localStorage.removeItem(SAVED_KEY + ':probe');
   } catch (e) {
-    showStorageError('This browser is blocking storage (for example, in a private window), so RAMS can’t be saved here.');
-    saveBtn.disabled = true;
+    localStore.disabled = true;
+    localStore.note = 'This browser is blocking storage (for example, in a private window), so RAMS can’t be saved here.';
   }
   renderSavedList();
+  updateSaveUI();
 })();

@@ -15,20 +15,27 @@
         <h1>RAMS Generator</h1>
         <p>Risk Assessment &amp; Method Statement for UK event setups</p>
       </div>
-      <a class="app-header-link" href="index.html">About this tool</a>
+      <div class="app-header-right">
+        <a class="app-header-link" href="index.html">About this tool</a>
+        <div id="account-slot" class="account-slot"></div>
+      </div>
     </div>
   </header>
 
   <main class="wrap">
+    <div id="account-banner" class="account-banner no-print" role="status" aria-live="polite" hidden></div>
+
     <section id="saved-section" class="card no-print" aria-labelledby="saved-heading">
       <div class="saved-head">
         <h2 id="saved-heading">Saved RAMS</h2>
         <span id="saved-count" class="saved-count"></span>
+        <span id="saved-where" class="saved-where">In this browser</span>
       </div>
       <p id="saved-empty" class="hint">Nothing saved yet. Generate a RAMS and tap <strong>Save RAMS</strong> to keep it here.</p>
       <ul id="saved-list" class="saved-list"></ul>
       <p id="storage-error" class="error" role="alert" hidden></p>
-      <p class="hint saved-note">Saved RAMS are stored only in this browser on this device. Clearing your browser data deletes them.</p>
+      <p id="saved-note" class="hint saved-note">Saved RAMS are stored only in this browser on this device. Clearing your browser data deletes them.</p>
+      <div id="account-panel" class="account-panel"></div>
     </section>
 
     <form id="rams-form" class="card no-print" novalidate>
@@ -116,7 +123,9 @@
     </div>
   </footer>
 
+  <script src="config.js"></script>
   <script src="data.js"></script>
   <script src="app.js"></script>
+  <script src="account.js"></script>
 </body>
 </html>

@@ -25,7 +25,7 @@ UK event companies and the people who have to hand a venue, client or safety off
 - **Small teams and freelancers**, such as crew chiefs and production managers without a health and safety department
 - **Venue and event managers** who want a structure to check supplier RAMS against
 
-It runs entirely in the browser, with no account, server or build step. Nothing you type is uploaded.
+The basic tool runs entirely in the browser, with no account, server or build step, and nothing you type is uploaded. An optional **Pro** plan adds accounts and a Stripe subscription, so users can save RAMS to their account and open them on any device.
 
 ## Features
 
@@ -54,7 +54,16 @@ It runs entirely in the browser, with no account, server or build step. Nothing 
   - **Delete** needs a second tap within a few seconds, so a stray tap can't lose work.
   - The app warns you before you leave the page or open another RAMS with unsaved changes.
   - Saved RAMS stay in this browser on this device only. They don't sync between devices, and clearing site data deletes them. Most browsers allow about 5 MB, which is enough for dozens of documents.
+- **Pro plan (optional):** sign in by emailed link, upgrade through Stripe Checkout, and RAMS are saved to the user's account instead of the browser. Users manage or cancel their subscription in Stripe's customer portal. If Pro lapses, they can still open and delete their account RAMS but not change them. Pro is switched off until you complete the [accounts and payments setup](docs/accounts-and-payments.md).
 - **Remembers your form:** form entries are saved in your browser's local storage, so a refresh doesn't lose them. "Clear form" wipes them.
+
+## Accounts and payments
+
+Pro is optional and off by default. To switch it on, follow **[docs/accounts-and-payments.md](docs/accounts-and-payments.md)**: create a Supabase project, run the migration, deploy the three Edge Functions, create the product and webhook in Stripe, then fill in `config.js`.
+
+How payment is enforced: the database only lets a user save to their account while their Stripe subscription is active (`is_pro()` in the migration). The subscription status is written only by the `stripe-webhook` function, after it has checked Stripe's signature. The browser code can't grant Pro.
+
+What Pro doesn't lock: the generator itself still runs in the browser, and while the repository is public its code can be copied. Pro's value is the account features the server controls.
 
 ## Running it
 
@@ -71,14 +80,19 @@ To host it, upload the files to any static host (GitHub Pages, Netlify, an S3 bu
 
 ## Files
 
-| File          | Purpose                                                          |
-|---------------|------------------------------------------------------------------|
-| `index.html`  | Landing page: what the tool does, who it's for, disclaimer       |
-| `landing.css` | Landing page styles                                              |
-| `app.html`    | The generator: form, saved RAMS list and document view          |
-| `styles.css`  | App screen styles (mobile-first), print styles, shared tokens    |
-| `app.js`      | Form handling, validation, rendering, saving and printing        |
-| `data.js`     | Content library: hazards, controls, ratings and method steps     |
+| File / folder         | Purpose                                                                  |
+|-----------------------|--------------------------------------------------------------------------|
+| `index.html`          | Landing page: what the tool does, who it's for, pricing, disclaimer      |
+| `landing.css`         | Landing page styles                                                      |
+| `app.html`            | The generator: form, saved RAMS list and document view                  |
+| `styles.css`          | App screen styles (mobile-first), print styles, shared tokens            |
+| `app.js`              | Form handling, validation, rendering, saving and printing                |
+| `data.js`             | Content library: hazards, controls, ratings and method steps             |
+| `config.js`           | Supabase details and Pro price label (blank = Pro switched off)          |
+| `account.js`          | Sign-in, upgrade, billing and saving to the account (Pro)                |
+| `supabase/migrations` | Database tables and rules that enforce payment                           |
+| `supabase/functions`  | Edge Functions: Stripe Checkout, customer portal and webhook             |
+| `docs/accounts-and-payments.md` | Step-by-step setup for Supabase and Stripe                     |
 
 ## Customising the content
 
