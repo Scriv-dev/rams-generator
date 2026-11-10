@@ -13,7 +13,10 @@
   <header class="site-header">
     <div class="wrap site-header-inner">
       <a class="brand" href="index.html">RAMS Generator</a>
-      <a class="btn btn-light btn-small" href="app.html">Open the generator</a>
+      <nav class="site-nav" aria-label="Main">
+        <a class="site-nav-link" href="#pricing">Pricing</a>
+        <a class="btn btn-light btn-small" href="app.html">Open the generator</a>
+      </nav>
     </div>
   </header>
 
@@ -28,7 +31,7 @@
             <a class="btn btn-primary btn-large" href="app.html">Start a RAMS</a>
             <a class="btn btn-ghost btn-large" href="#how-it-works">See how it works</a>
           </div>
-          <p class="hero-note">Free. No sign-up. Works on your phone. Your data stays in your browser.</p>
+          <p class="hero-note">No sign-up needed to start. Works on your phone.</p>
         </div>
 
         <figure class="excerpt" aria-label="Example excerpt from a generated risk assessment">
@@ -131,10 +134,43 @@
       </div>
     </section>
 
-    <section class="band band-alt" aria-labelledby="privacy-heading">
+    <section id="pricing" class="band band-alt" aria-labelledby="pricing-heading">
       <div class="wrap">
-        <h2 id="privacy-heading">Your data stays on your device</h2>
-        <p class="section-lede">There's no account and no server. Everything you type, and every RAMS you save, is stored only in the browser you're using. Nothing is uploaded. That also means saved RAMS don't sync between devices, and clearing your browser data deletes them.</p>
+        <h2 id="pricing-heading">Pricing</h2>
+        <p class="section-lede">Start without an account. Upgrade when you want your RAMS on every device.</p>
+        <div class="plans">
+          <div class="plan">
+            <h3>Basic</h3>
+            <p class="plan-price">No account needed</p>
+            <ul class="checklist">
+              <li>Full RAMS generator, all activities</li>
+              <li>Edit any text and rating</li>
+              <li>Print or save as PDF</li>
+              <li>Save RAMS in this browser</li>
+            </ul>
+            <a class="btn btn-ghost" href="app.html">Start a RAMS</a>
+          </div>
+          <div class="plan plan-pro">
+            <h3>Pro</h3>
+            <p class="plan-price is-soon" id="pro-price">Coming soon</p>
+            <p class="plan-sub" id="pro-sub">Subscription. Cancel any time.</p>
+            <ul class="checklist">
+              <li>Everything in Basic</li>
+              <li>RAMS saved to your account</li>
+              <li>Open and edit them on any device</li>
+              <li>Sign in with an emailed link, no password</li>
+            </ul>
+            <a class="btn btn-primary" id="pro-cta" href="app.html" aria-disabled="true" tabindex="-1">Coming soon</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="band" aria-labelledby="privacy-heading">
+      <div class="wrap">
+        <h2 id="privacy-heading">Where your data is kept</h2>
+        <p class="section-lede"><strong>Without an account,</strong> everything you type and every RAMS you save stays in the browser you're using. Nothing is uploaded, so saved RAMS don't sync between devices, and clearing your browser data deletes them.</p>
+        <p class="section-lede"><strong>With Pro,</strong> the RAMS you save are stored in your account so you can open them anywhere you sign in. Only you can see them. Payments are handled by Stripe; we never see your card details.</p>
       </div>
     </section>
 
@@ -163,5 +199,21 @@
       <p><a href="app.html">Open the generator</a> · <a href="#disclaimer">Disclaimer</a></p>
     </div>
   </footer>
+
+  <script src="config.js"></script>
+  <script>
+    /* Show the Pro price once accounts are set up in config.js. */
+    (function () {
+      var cfg = window.RAMS_CONFIG || {};
+      if (!cfg.supabaseUrl) return; // Pro not switched on yet: keep "Coming soon".
+      var price = document.getElementById('pro-price');
+      var cta = document.getElementById('pro-cta');
+      price.textContent = cfg.proPriceLabel || 'See price in the app';
+      price.classList.toggle('is-soon', !cfg.proPriceLabel);
+      cta.textContent = 'Get Pro';
+      cta.removeAttribute('aria-disabled');
+      cta.removeAttribute('tabindex');
+    })();
+  </script>
 </body>
 </html>
