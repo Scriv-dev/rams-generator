@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RAMS Generator</title>
+  <meta name="description" content="Generate Risk Assessment and Method Statement (RAMS) documents for UK event setups.">
+  <meta name="theme-color" content="#1f3a5f">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="app-header no-print">
+    <div class="wrap">
+      <h1>RAMS Generator</h1>
+      <p>Risk Assessment &amp; Method Statement for UK event setups</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <form id="rams-form" class="card no-print" novalidate>
+      <h2>1. Event details</h2>
+      <div class="grid">
+        <label class="field">
+          <span>Event name <em>*</em></span>
+          <input type="text" name="eventName" required autocomplete="off" placeholder="e.g. Summer Garden Party">
+        </label>
+        <label class="field">
+          <span>Event date <em>*</em></span>
+          <input type="date" name="eventDate" required>
+        </label>
+        <label class="field">
+          <span>Venue <em>*</em></span>
+          <input type="text" name="venue" required autocomplete="off" placeholder="e.g. Hyde Park, London">
+        </label>
+        <label class="field">
+          <span>Client <em>*</em></span>
+          <input type="text" name="client" required autocomplete="off" placeholder="e.g. Acme Ltd">
+        </label>
+        <label class="field">
+          <span>Event type <em>*</em></span>
+          <select name="eventType" required>
+            <option value="">Choose…</option>
+            <option value="festival">Festival</option>
+            <option value="corporate">Corporate event</option>
+            <option value="wedding">Wedding</option>
+            <option value="outdoor">Outdoor show</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Prepared by <small>(optional)</small></span>
+          <input type="text" name="preparedBy" autocomplete="name" placeholder="Name and company">
+        </label>
+      </div>
+
+      <h2>2. Activities</h2>
+      <p class="hint">Tick every activity that applies to this event.</p>
+      <div id="activity-list" class="activities"></div>
+
+      <h2>3. Sign-off</h2>
+      <div class="grid">
+        <label class="field field-wide">
+          <span>Staff names <small>(optional, one per line)</small></span>
+          <textarea name="staff" rows="4" placeholder="Jane Smith – Crew Chief&#10;Tom Jones – Rigger"></textarea>
+        </label>
+        <label class="field">
+          <span>Extra blank signature rows</span>
+          <input type="number" name="blankRows" min="0" max="40" value="6" inputmode="numeric">
+        </label>
+      </div>
+
+      <p id="form-error" class="error" role="alert" hidden></p>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">Generate RAMS</button>
+        <button type="button" id="reset-btn" class="btn btn-ghost">Clear form</button>
+      </div>
+    </form>
+
+    <section id="output" hidden>
+      <div class="toolbar no-print">
+        <p class="hint">Tip: click any text in the document to edit it, and tap a risk rating to change it, before printing.</p>
+        <div class="actions">
+          <button type="button" id="print-btn" class="btn btn-primary">Print / Save as PDF</button>
+          <button type="button" id="edit-btn" class="btn btn-ghost">Back to form</button>
+        </div>
+      </div>
+      <article id="document" class="doc"></article>
+    </section>
+  </main>
+
+  <footer class="app-footer no-print">
+    <div class="wrap">
+      <p>Generated content is a starting template. It must be reviewed by a competent person and adapted to the specific site, venue and event before use.</p>
+    </div>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
