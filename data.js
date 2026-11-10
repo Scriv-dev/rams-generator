@@ -5,6 +5,9 @@
  *   {public}  – the audience for this event type (e.g. "guests", "festival-goers")
  *
  * Risk ratings are the residual rating with the listed existing controls in place.
+ *
+ * shortControls (optional): the key control for the short version. Without it,
+ * the short version uses the first sentence of controls.
  */
 
 window.RAMS_DATA = {
@@ -49,7 +52,7 @@ window.RAMS_DATA = {
       {
         hazard: 'Wind loading on temporary structures (marquees, stages, towers, fencing, banners) causing collapse, uplift or flying debris',
         who: 'Crew, contractors, {public}',
-        controls: 'Each structure\'s maximum design wind speed (gust, in m/s or mph) is taken from its supplier\'s design calculations or operations manual and written into the wind action plan (section 5), with amber and red trigger speeds and the action at each. Wind measured with an anemometer mounted clear of obstructions at or near the height of the tallest structure, read every 30 minutes (every 15 minutes at amber) and logged. Gust speed is used for decisions, not the average. Met Office forecast and warnings checked every morning and before each build or event day.',
+        controls: 'Each structure\'s maximum design wind speed (gust, in m/s or mph) is taken from its supplier\'s design calculations or operations manual and written into the wind action plan, with amber and red trigger speeds and the action at each. Wind measured with an anemometer mounted clear of obstructions at or near the height of the tallest structure, read every 30 minutes (every 15 minutes at amber) and logged. Gust speed is used for decisions, not the average. Met Office forecast and warnings checked every morning and before each build or event day.',
         rating: 'medium',
         actions: 'Fill in the wind action plan with every structure\'s figures before build starts and brief crew chiefs on who calls amber and red. Name the person responsible for reading and logging the anemometer.',
         outdoor: true
@@ -90,6 +93,18 @@ window.RAMS_DATA = {
     power: {
       label: 'Power distribution',
       short: 'Temporary power, generators and cable runs',
+      competence: [
+        'Temporary installation designed, installed and tested by a competent electrician experienced in BS 7909 systems.',
+        'Generator refuelling only by named, briefed people.',
+        'Crew briefed not to alter, extend or re-route the installation; changes go through the electrician.'
+      ],
+      checks: [
+        'BS 7909 installation certificate on site',
+        'RCD test-button log completed today',
+        'Generators fenced, on drip trays, extinguisher in place',
+        'Every cable crossing ramped, butted and taped',
+        'Connectors off the ground and lids closed'
+      ],
       hazards: [
         {
           hazard: 'Electric shock from an earth fault on a final circuit (damaged lead, water ingress, faulty appliance)',
@@ -175,6 +190,18 @@ window.RAMS_DATA = {
     staging: {
       label: 'Staging',
       short: 'Stage decks, risers and steps',
+      competence: [
+        'Stage built by crew trained on the specific staging system.',
+        'Structure signed off by a competent person (the supplier’s supervisor or a structural engineer).',
+        'Supervisor holds the design, loading limits and any wind limits for the stage.'
+      ],
+      checks: [
+        'Handover certificate signed',
+        'Legs on base plates or sole boards and level',
+        'Handrails, edge protection and edge marking fitted',
+        'Steps secure with handrails',
+        'Roof ballast and guys as per design (outdoor roofs)'
+      ],
       hazards: [
         {
           hazard: 'Collapse or instability of stage structure',
@@ -185,6 +212,7 @@ window.RAMS_DATA = {
         },
         {
           hazard: 'Wind loading on stage roof, side wings, banners and flown PA (outdoor stages)',
+          shortControls: 'Roof, wings and banner frames ballasted and guyed to the engineer\'s design; scrim removed and flown PA lowered at the wind speeds in the operations manual.',
           who: 'Crew, performers, {public}',
           controls: 'Stage roof and any PA wings or banner frames erected to the engineer\'s design, with ballast of the specified weight and position on every leg or ballast point, and guy wires tensioned as specified. Scrim, banners and backdrops fitted only where the design allows for their wind load, with quick-release fixings or cut-away points so they can be removed fast. The operations manual sets the wind speeds for removing scrim, lowering flown PA and stopping the show, and these go on the wind action plan.',
           rating: 'medium',
@@ -230,9 +258,22 @@ window.RAMS_DATA = {
     marquee: {
       label: 'Marquee or tent',
       short: 'Temporary demountable structures',
+      competence: [
+        'Erection supervised by the contractor’s trained crew chief (MUTA safety scheme or equivalent).',
+        'Cable avoidance tool (CAT) used only by a trained operator.',
+        'A named person reads the anemometer and makes the amber and red calls.'
+      ],
+      checks: [
+        'Handover and flame-retardancy certificates on site',
+        'Stakes or ballast as per design; straps tensioned',
+        'Guy lines and stakes marked or covered',
+        'Exits signed, lit and clear',
+        'Wind readings logged'
+      ],
       hazards: [
         {
           hazard: 'Structure collapse or uplift in high winds',
+          shortControls: 'Erected to BS EN 13782 by a competent contractor, staked or ballasted to the design calculations; at the amber wind speed close all walls and stop entry; at red, evacuate.',
           who: 'Crew, {public}',
           controls: 'Structure supplied and erected to BS EN 13782 by a competent contractor (e.g. MUTA member), with a stated maximum design wind speed. Stakes of the length, number and spacing given in the design calculations, or ballast of the stated weight per leg where staking is not possible (hard standing, buried services). Stakes checked for lift and ratchet straps for tension after erection and each morning. Walls and doors kept fully closed on the windward side in strong winds so wind cannot get under the roof; walls never removed on one side only. At the amber trigger speed: close all walls and doors and stop people entering. At the red trigger speed: evacuate the structure to the agreed assembly point.',
           rating: 'medium',
@@ -285,9 +326,20 @@ window.RAMS_DATA = {
     fencing: {
       label: 'Fencing and barriers',
       short: 'Heras fencing, pedestrian barriers and crowd barriers',
+      competence: [
+        'Crew briefed on the fence system, coupler fitting and bracing intervals.',
+        'Crowd barriers installed by the supplier’s crew to the engineer’s layout.'
+      ],
+      checks: [
+        'Couplers at top and bottom of every joint',
+        'Stays and ballast at the required intervals, ends, corners and gates',
+        'Emergency gates open freely and are staffed or monitored',
+        'No scrim or banners beyond the supplier’s wind-loading guidance'
+      ],
       hazards: [
         {
           hazard: 'Temporary (Heras-type) fence lines blown over by wind, falling onto people',
+          shortControls: 'Couplers top and bottom of every joint; ballasted stay at least every 4th panel, and on every panel where scrim or branding is fitted; extra stays at ends, corners and gates.',
           who: 'Crew, stewards, {public}',
           controls: 'Every panel sits in a rubber or concrete foot. Panels joined with a coupler at top and bottom of every joint, bolts facing the secure side. Unclad runs: a stabiliser stay with its own ballast foot (or pinned) at least every 4th panel, and at every end, corner, gate post and change of direction. Runs with scrim, mesh or branding: stay and ballast on every panel, or as the supplier\'s wind-loading guidance requires, because clad fencing acts as a sail. Extra ballast blocks added on exposed or elevated fence lines.',
           rating: 'medium',
@@ -340,6 +392,17 @@ window.RAMS_DATA = {
     rigging: {
       label: 'Lighting and sound rigging',
       short: 'Trussing, flown lighting, PA and AV equipment',
+      competence: [
+        'Flown rigging carried out by competent riggers (for example, holders of the National Rigging Certificate).',
+        'Hoists operated only by crew trained on that hoist type.',
+        'Lifting equipment thoroughly examined under LOLER: every 6 months for lifting accessories, every 12 months for other lifting equipment.'
+      ],
+      checks: [
+        'Rigging plot and load calculations on site',
+        'LOLER examination reports in date for all hoists and accessories',
+        'Safety bond on every flown fixture',
+        'Exclusion zone set during flying and derigging'
+      ],
       hazards: [
         {
           hazard: 'Falling objects from truss or rigging points',
@@ -401,9 +464,22 @@ window.RAMS_DATA = {
     vehicles: {
       label: 'Vehicle movements',
       short: 'Deliveries, forklifts, telehandlers and site vehicles',
+      competence: [
+        'Plant operators hold a valid CPCS, NPORS or equivalent card for the machine category.',
+        'Banksmen trained in vehicle marshalling signals.',
+        'All drivers briefed on the traffic management plan on arrival.'
+      ],
+      checks: [
+        'Traffic management plan issued to all suppliers',
+        'Walkway barriers continuous; crossing points marked',
+        '5 mph signs at every vehicle entrance',
+        'Banksman available for every reversing movement',
+        'Operator cards checked and recorded'
+      ],
       hazards: [
         {
           hazard: 'Pedestrians struck by vehicles or plant on shared site routes',
+          shortControls: 'Walkways separated from vehicle routes by physical barriers, not tape or cones; separate pedestrian and vehicle gates; marked crossing points; one-way loop where possible; 5 mph site limit.',
           who: 'Crew, contractors, {public}',
           controls: 'Traffic management plan with a site map showing separate vehicle routes and pedestrian walkways. Walkways separated from vehicle routes by physical barriers (pedestrian barriers or Heras fencing), not tape or cones alone. Pedestrian and vehicle gates are separate; where the two must cross, a marked crossing point with signs on both approaches and drivers giving way. One-way vehicle loop wherever the site allows, to cut out reversing. 5 mph (8 km/h) site speed limit signed at every vehicle entrance. Routes lit for work after dark.',
           rating: 'medium',
@@ -461,6 +537,17 @@ window.RAMS_DATA = {
     height: {
       label: 'Working at height',
       short: 'Ladders, podiums, towers and MEWPs',
+      competence: [
+        'MEWP operators hold an IPAF PAL card for the machine category.',
+        'Mobile towers erected and dismantled by PASMA-trained staff.',
+        'Written rescue plan in place for MEWP work, with someone at ground level who can lower the platform.'
+      ],
+      checks: [
+        'Pre-use inspection recorded for each machine or tower',
+        'IPAF or PASMA cards checked',
+        'Wind reading taken at platform height before use',
+        'Exclusion zone set below the work'
+      ],
       hazards: [
         {
           hazard: 'Falls from height from ladders, towers, MEWPs or structures',
@@ -513,6 +600,15 @@ window.RAMS_DATA = {
     manual: {
       label: 'Manual handling',
       short: 'Lifting, carrying, pushing and pulling equipment',
+      competence: [
+        'Crew briefed on safe lifting technique at induction.',
+        'Loads above the guideline weights in HSE guidance L23 assessed individually, with mechanical aids or team lifts planned.'
+      ],
+      checks: [
+        'Trolleys, pallet trucks and tail lifts available',
+        'Heavy cases labelled with their weight',
+        'Routes from vehicles to work areas clear'
+      ],
       hazards: [
         {
           hazard: 'Musculoskeletal injury from lifting heavy or awkward loads',
@@ -587,6 +683,39 @@ window.RAMS_DATA = {
       red: 'No work at height; MEWPs stowed; towers tied in or dismantled.'
     }
   ],
+
+  /* Detail levels for the generated document. */
+  detailLevels: {
+    short: {
+      label: 'Short',
+      note: 'This is the short version: it lists medium and high residual risks only, with the key control for each. Low residual risks are managed by the standard site rules in the method statement. Generate the standard or detailed version for the full assessment.'
+    },
+    standard: { label: 'Standard', note: '' },
+    detailed: {
+      label: 'Detailed',
+      note: 'This is the detailed version: it adds competence and training requirements, a pre-start inspection checklist and supervision, welfare and monitoring arrangements.'
+    }
+  },
+
+  /* Extra general sections for the detailed version. */
+  detailed: {
+    supervision: [
+      'A named crew chief supervises each work area and is the point of contact for the venue and client.',
+      'Crew chiefs carry radios on an agreed channel; a mobile number is listed for each in the emergency arrangements.',
+      'A daily briefing covers the day’s tasks, weather, vehicle movements and any changes to this RAMS.',
+      'Anyone can stop work they believe is unsafe. Work restarts only once the crew chief has resolved the issue.'
+    ],
+    welfare: [
+      'Toilets, hand-washing, drinking water and a sheltered rest area available to crew throughout build and break.',
+      'A trained first aider and a stocked first aid kit on site during all working hours.',
+      'Shift lengths and breaks planned so no one works excessive hours; drivers get rest before driving home.'
+    ],
+    monitoring: [
+      'Crew chiefs check the controls in this RAMS during each site walk and record any problems.',
+      'Accidents, near misses and dangerous occurrences are reported to the crew chief, recorded, and reported under RIDDOR where required.',
+      'This RAMS is reviewed and reissued if the site, scope, weather plan or contractors change, or after any incident.'
+    ]
+  },
 
   /* General method steps wrapped around the activity-specific ones. */
   method: {

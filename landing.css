@@ -21,6 +21,9 @@
 .site-nav-link:hover { opacity: 0.85; }
 @media (max-width: 379px) { .site-nav-link { display: none; } }
 .brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
   color: var(--brand-ink);
   font-weight: 700;
   font-size: 1.1rem;
@@ -257,3 +260,8 @@
 @media (prefers-reduced-motion: no-preference) {
   html { scroll-behavior: smooth; }
 }
+
+.feedback-band-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 32px; }
+.feedback-band-inner > div { flex: 1 1 320px; min-width: 0; }
+.feedback-band .section-lede { margin-bottom: 0; }
+@media (max-width: 479px) { .feedback-band .btn { flex: 1 1 100%; } }

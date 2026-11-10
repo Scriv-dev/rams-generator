@@ -82,7 +82,23 @@
       <p class="hint">Tick every activity that applies to this event.</p>
       <div id="activity-list" class="activities"></div>
 
-      <h2>3. Sign-off</h2>
+      <h2 id="detail-heading">3. Detail level</h2>
+      <div class="detail-options" role="radiogroup" aria-labelledby="detail-heading">
+        <label class="detail-option">
+          <input type="radio" name="detail" value="short">
+          <span><strong>Short</strong><small>Medium and high risks only, key controls. Quick to read on site.</small></span>
+        </label>
+        <label class="detail-option">
+          <input type="radio" name="detail" value="standard" checked>
+          <span><strong>Standard</strong><small>Every risk with full controls and the method statement.</small></span>
+        </label>
+        <label class="detail-option">
+          <input type="radio" name="detail" value="detailed">
+          <span><strong>Detailed</strong><small>Adds competence, inspection checklists, supervision and welfare.</small></span>
+        </label>
+      </div>
+
+      <h2>4. Sign-off</h2>
       <div class="grid">
         <label class="field field-wide">
           <span>Staff names <small>(optional, one per line)</small></span>
@@ -114,18 +130,25 @@
         <p id="save-status" class="save-status" role="status" aria-live="polite"></p>
       </div>
       <article id="document" class="doc"></article>
+      <div class="feedback-prompt no-print" data-feedback-prompt hidden>
+        <p><strong>Missing a hazard, activity or feature?</strong> Tell us and we'll look at adding it.</p>
+        <button type="button" class="btn btn-secondary btn-small" data-feedback>Send feedback</button>
+      </div>
     </section>
   </main>
 
   <footer class="app-footer no-print">
     <div class="wrap">
       <p>Every RAMS this tool generates is a draft. A competent person must check it, adapt it to the site, venue and event, and approve it before work starts. <a href="index.html#disclaimer">Read the full disclaimer</a>.</p>
+      <p><a href="#" data-feedback hidden>Send feedback</a></p>
     </div>
   </footer>
 
   <script src="config.js"></script>
+  <script src="stats.js"></script>
   <script src="data.js"></script>
   <script src="app.js"></script>
   <script src="account.js"></script>
+  <script src="feedback.js"></script>
 </body>
 </html>

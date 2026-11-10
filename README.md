@@ -39,6 +39,7 @@ The basic tool runs entirely in the browser, with no account, server or build st
   - Vehicle movements
   - Working at height
   - Manual handling
+- **Detail level:** choose **Short** (medium and high risks only with the key control for each, and a compact print layout), **Standard** (every risk with full controls) or **Detailed** (adds competence and training requirements, a pre-start inspection checklist, and supervision, welfare and monitoring arrangements).
 - **Risk assessments:** a table for each ticked activity, plus a general site conditions table, with columns for *hazard*, *who might be harmed*, *existing controls*, *risk rating* (low / medium / high) and *further actions*.
 - **Method statement:** numbered steps for **setup**, **during the event** and **pack-down**, grouped by activity, with general induction and handover steps around them.
 - **Specific UK controls:** for example, 30 mA RCDs on every final circuit with time-delayed upstream RCDs and daily test-button checks; cable protectors rated for pedestrians or vehicles, with planned cable routes; Heras fence stays and ballast at set intervals, with extra bracing for clad runs; physical separation of pedestrians and vehicles, with banksman rules and plant exclusion zones; and wind loading on marquees, stages, towers, fencing and MEWPs.
@@ -55,7 +56,36 @@ The basic tool runs entirely in the browser, with no account, server or build st
   - The app warns you before you leave the page or open another RAMS with unsaved changes.
   - Saved RAMS stay in this browser on this device only. They don't sync between devices, and clearing site data deletes them. Most browsers allow about 5 MB, which is enough for dozens of documents.
 - **Pro plan (optional):** sign in by emailed link, upgrade through Stripe Checkout, and RAMS are saved to the user's account instead of the browser. Users manage or cancel their subscription in Stripe's customer portal. If Pro lapses, they can still open and delete their account RAMS but not change them. Pro is switched off until you complete the [accounts and payments setup](docs/accounts-and-payments.md).
+- **Feedback form (optional):** a short "Send feedback" form on the landing page, in the generator's footer and under every generated RAMS. Messages arrive in your inbox through Formspree.
+- **Visitor counter (optional):** privacy-friendly counting with GoatCounter. It uses no cookies, respects Do Not Track, and counts a few anonymous actions (RAMS generated, saved, printed).
 - **Remembers your form:** form entries are saved in your browser's local storage, so a refresh doesn't lose them. "Clear form" wipes them.
+
+## Feedback and visitor counter
+
+Both are optional and off until you add an ID to `config.js`.
+
+### Feedback form (Formspree)
+
+1. Sign up at [formspree.io](https://formspree.io) (the free plan allows 50 messages a month) and create a new form.
+2. Copy the form ID: the part after `/f/` in its endpoint, e.g. `xyzabcde` from `https://formspree.io/f/xyzabcde`.
+3. Put it in `config.js` as `formspreeId: 'xyzabcde'`, then commit and push.
+4. Send a test message from the site. Formspree asks you to confirm the first one by email.
+
+Each message includes the text, an optional topic and reply email, the page, and (from the generator) the event type, activities and detail level chosen. It never includes event names, venues, clients or staff names. A hidden spam-trap field filters out most bots.
+
+### Visitor counter (GoatCounter)
+
+1. Sign up at [goatcounter.com](https://www.goatcounter.com) and choose a code, e.g. `ramsgenerator` for `ramsgenerator.goatcounter.com`. It's free for non-commercial use; commercial sites are asked for a small donation.
+2. Put the code in `config.js` as `goatcounterCode: 'ramsgenerator'`, then commit and push.
+3. Visit the live site, then check your GoatCounter dashboard.
+
+How it stays privacy-friendly:
+- It sets no cookies and uses no local storage.
+- No third-party script runs on the site. `stats.js` sends one small request per page view to GoatCounter's documented count endpoint, containing only the page path (never the query string or `#hash`), the title, the referring site and the screen width.
+- Visitors whose browser sends Do Not Track or Global Privacy Control aren't counted at all.
+- Visits from `localhost` aren't counted.
+
+Besides page views, the dashboard shows these anonymous events: `rams-generated/short|standard|detailed`, `rams-saved/local|cloud`, `rams-printed`, `feedback-sent` and `pro-upgrade-click`.
 
 ## Accounts and payments
 
@@ -88,7 +118,9 @@ To host it, upload the files to any static host (GitHub Pages, Netlify, an S3 bu
 | `styles.css`          | App screen styles (mobile-first), print styles, shared tokens            |
 | `app.js`              | Form handling, validation, rendering, saving and printing                |
 | `data.js`             | Content library: hazards, controls, ratings and method steps             |
-| `config.js`           | Supabase details and Pro price label (blank = Pro switched off)          |
+| `config.js`           | Optional settings: Supabase, Pro price, Formspree and GoatCounter IDs    |
+| `feedback.js`         | Feedback form (Formspree)                                                |
+| `stats.js`            | Cookie-free visitor counter (GoatCounter)                                |
 | `account.js`          | Sign-in, upgrade, billing and saving to the account (Pro)                |
 | `supabase/migrations` | Database tables and rules that enforce payment                           |
 | `supabase/functions`  | Edge Functions: Stripe Checkout, customer portal and webhook             |

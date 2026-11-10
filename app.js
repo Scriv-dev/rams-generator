@@ -65,6 +65,7 @@
       venue: (fd.get('venue') || '').trim(),
       client: (fd.get('client') || '').trim(),
       eventType: fd.get('eventType') || '',
+      detail: DATA.detailLevels[fd.get('detail')] ? fd.get('detail') : 'standard',
       preparedBy: (fd.get('preparedBy') || '').trim(),
       activities: fd.getAll('activities'),
       staff: (fd.get('staff') || '').split('\n').map(function (s) { return s.trim(); }).filter(Boolean),
@@ -84,6 +85,8 @@
     });
     form.elements.staff.value = values.staffRaw || '';
     if (values.blankRows != null) form.elements.blankRows.value = values.blankRows;
+    var detailBox = form.querySelector('input[name="detail"][value="' + (values.detail || 'standard') + '"]');
+    if (detailBox) detailBox.checked = true;
     (values.activities || []).forEach(function (key) {
       var box = form.querySelector('input[name="activities"][value="' + key + '"]');
       if (box) box.checked = true;
@@ -127,6 +130,10 @@
   }
 
   function riskTable(title, number, hazards, ctx) {
+    if (!hazards.length) {
+      return '<section class="ra-block"><h3>' + number + ' ' + esc(title) + '</h3>' +
+        '<p class="note">No medium or high residual risks at this detail level.</p></section>';
+    }
     var rows = hazards.map(function (h) {
       return '<tr>' +
         '<td data-label="Hazard">' + esc(fill(h.hazard, ctx)) + '</td>' +
@@ -145,10 +152,22 @@
       '<tbody>' + rows + '</tbody></table></section>';
   }
 
+  function listHtml(items) {
+    return '<ul>' + items.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>';
+  }
+
   function stepList(steps) {
     return '<ol class="steps">' + steps.map(function (s) {
       return '<li>' + esc(s) + '</li>';
     }).join('') + '</ol>';
+  }
+
+  /* First sentence only, for the short version. "e.g." and "i.e." don't end a sentence. */
+  function firstSentence(text) {
+    var safe = text.replace(/\b(e\.g|i\.e|etc)\./g, function (m) { return m.replace(/\./g, '\u0000'); });
+    var cut = safe.search(/\.\s+(?=[A-Z(])/);
+    var out = cut === -1 ? safe : safe.slice(0, cut + 1);
+    return out.replace(/\u0000/g, '.');
   }
 
   function methodPhase(title, number, before, perActivity, after) {
@@ -190,10 +209,25 @@
     // Outdoor weather row: skip for corporate events unless a marquee/tent is in use.
     var isOutdoor = v.eventType !== 'corporate' || v.activities.indexOf('marquee') !== -1;
     function applies(h) { return !h.outdoor || isOutdoor; }
-    var generalHazards = DATA.general.hazards.filter(applies);
 
     var M = DATA.method;
     var html = '';
+
+    /* Detail level: short keeps medium/high risks and the first sentence of each control;
+       detailed adds competence, checklists and supervision sections. */
+    var detail = DATA.detailLevels[v.detail] ? v.detail : 'standard';
+    var isShort = detail === 'short';
+    var isDetailed = detail === 'detailed';
+    function pick(hazards) {
+      var list = hazards.filter(applies);
+      if (!isShort) return list;
+      return list.filter(function (h) { return h.rating !== 'low'; }).map(function (h) {
+        return { hazard: h.hazard, who: h.who, rating: h.rating,
+          controls: h.shortControls || firstSentence(h.controls), actions: firstSentence(h.actions) };
+      });
+    }
+    var sec = 0; // running section number
+    function nextSection() { sec += 1; return sec; }
 
     /* Title block */
     html += '<header class="doc-header">' +
@@ -204,10 +238,11 @@
       '<tr><th>Date</th><td>' + esc(formatDate(v.eventDate)) + '</td><th>Client</th><td>' + esc(v.client) + '</td></tr>' +
       '<tr><th>Venue</th><td>' + esc(v.venue) + '</td><th>Prepared by</th><td>' + (esc(v.preparedBy) || '&nbsp;') + '</td></tr>' +
       '<tr><th>Date of issue</th><td>' + esc(today()) + '</td><th>Revision</th><td>1</td></tr>' +
+      '<tr><th>Detail level</th><td>' + esc(DATA.detailLevels[detail].label) + '</td><th>Review date</th><td>&nbsp;</td></tr>' +
       '</tbody></table></header>';
 
     /* 1. Scope */
-    html += '<section class="doc-section"><h2>1. Scope</h2>' +
+    html += '<section class="doc-section"><h2>' + nextSection() + '. Scope</h2>' +
       '<p>This document covers the setup, operation and pack-down of temporary event infrastructure for <strong>' +
       esc(v.eventName) + '</strong> at <strong>' + esc(v.venue) + '</strong> on behalf of <strong>' + esc(v.client) +
       '</strong>. The event is ' + esc(type.scope) + '.</p>' +
@@ -215,10 +250,17 @@
       selected.map(function (a) { return '<li>' + esc(a.label) + ' – ' + esc(a.short.toLowerCase()) + '</li>'; }).join('') +
       '</ul>' +
       '<p>It was prepared with reference to the Health and Safety at Work etc. Act 1974, the Management of Health and Safety at Work Regulations 1999, the Construction (Design and Management) Regulations 2015 and ' +
-      esc(type.guidance) + '.</p></section>';
+      esc(type.guidance) + '.</p>' +
+      (DATA.detailLevels[detail].note ? '<p class="detail-note">' + esc(DATA.detailLevels[detail].note) + '</p>' : '') +
+      '</section>';
 
     /* 2. Risk rating key */
-    html += '<section class="doc-section"><h2>2. Risk rating key</h2>' +
+    if (isShort) {
+      html += '<section class="doc-section"><h2>' + nextSection() + '. Risk rating key</h2>' +
+        '<p>Ratings show the remaining risk with controls in place. <strong>Medium:</strong> controls and further actions must be in place before work starts. ' +
+        '<strong>High:</strong> do not start or continue work until further controls reduce the risk.</p></section>';
+    } else
+    html += '<section class="doc-section"><h2>' + nextSection() + '. Risk rating key</h2>' +
       '<p>Ratings show the remaining (residual) risk with the existing controls in place.</p>' +
       '<table class="key-table"><tbody>' +
       '<tr><td class="col-rating"><span class="rating rating-low">Low</span></td><td>Acceptable. Maintain existing controls and monitor.</td></tr>' +
@@ -227,10 +269,11 @@
       '</tbody></table></section>';
 
     /* 3. Risk assessments */
-    html += '<section class="doc-section"><h2>3. Risk assessments</h2>';
-    html += riskTable(DATA.general.label, '3.1', generalHazards, ctx);
+    var raSec = nextSection();
+    html += '<section class="doc-section"><h2>' + raSec + '. Risk assessments</h2>';
+    html += riskTable(DATA.general.label, raSec + '.1', pick(DATA.general.hazards), ctx);
     selected.forEach(function (a, i) {
-      html += riskTable(a.label, '3.' + (i + 2), a.hazards.filter(applies), ctx);
+      html += riskTable(a.label, raSec + '.' + (i + 2), pick(a.hazards), ctx);
     });
     html += '</section>';
 
@@ -238,11 +281,40 @@
     function phase(name) {
       return selected.map(function (a) { return { label: a.label, steps: a.method[name] || [] }; });
     }
-    html += '<section class="doc-section"><h2>4. Method statement</h2>';
-    html += methodPhase('Setup', '4.1', M.setupBefore, phase('setup'), M.setupAfter);
-    html += methodPhase('During the event', '4.2', M.duringBefore, phase('during'), M.duringAfter);
-    html += methodPhase('Pack-down', '4.3', M.packdownBefore, phase('packdown'), M.packdownAfter);
+    var msSec = nextSection();
+    // The short version keeps the induction and PPE steps from the general setup list.
+    var setupBefore = isShort ? M.setupBefore.slice(0, 2) : M.setupBefore;
+    html += '<section class="doc-section"><h2>' + msSec + '. Method statement</h2>';
+    html += methodPhase('Setup', msSec + '.1', setupBefore, phase('setup'), M.setupAfter);
+    html += methodPhase('During the event', msSec + '.2', M.duringBefore, phase('during'), M.duringAfter);
+    html += methodPhase('Pack-down', msSec + '.3', M.packdownBefore, phase('packdown'), M.packdownAfter);
     html += '</section>';
+
+    /* Detailed only: competence, checklists, supervision, welfare and monitoring. */
+    if (isDetailed) {
+      var cSec = nextSection();
+      var D = DATA.detailed;
+      html += '<section class="doc-section"><h2>' + cSec + '. Competence, checks and monitoring</h2>';
+      html += '<h3>' + cSec + '.1 Competence and training</h3>';
+      selected.forEach(function (a) {
+        if (a.competence && a.competence.length) html += '<h4>' + esc(a.label) + '</h4>' + listHtml(a.competence);
+      });
+      html += '<h3>' + cSec + '.2 Pre-start inspection checklist</h3>' +
+        '<p>Complete before work starts each day. Initial each item when checked.</p>' +
+        '<table class="check-table"><thead><tr><th>Check</th><th>Initials</th><th>Time</th></tr></thead><tbody>';
+      selected.forEach(function (a) {
+        if (!a.checks || !a.checks.length) return;
+        html += '<tr class="check-group"><th colspan="3">' + esc(a.label) + '</th></tr>';
+        a.checks.forEach(function (c) {
+          html += '<tr><td><span class="check-item"><span class="check-box" aria-hidden="true"></span><span>' + esc(c) + '</span></span></td><td></td><td></td></tr>';
+        });
+      });
+      html += '</tbody></table>';
+      html += '<h3>' + cSec + '.3 Supervision and communication</h3>' + listHtml(D.supervision);
+      html += '<h3>' + cSec + '.4 Welfare and first aid</h3>' + listHtml(D.welfare);
+      html += '<h3>' + cSec + '.5 Monitoring, reporting and review</h3>' + listHtml(D.monitoring);
+      html += '</section>';
+    }
 
     /* 5. PPE, weather and emergency arrangements */
     var ppe = ['Safety boots (toe protection)', 'High-visibility vest or jacket'];
@@ -251,7 +323,7 @@
     if (v.activities.indexOf('rigging') !== -1) ppe.push('Hearing protection during sound checks and performances');
     if (v.activities.indexOf('height') !== -1) ppe.push('Harness and restraint lanyard in MEWP baskets');
 
-    html += '<section class="doc-section"><h2>5. PPE, weather and emergency arrangements</h2>' +
+    html += '<section class="doc-section"><h2>' + nextSection() + '. PPE, weather and emergency arrangements</h2>' +
       '<h4>Required PPE</h4><ul>' + ppe.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul>' +
       windPlan(v, isOutdoor) +
       '<h4>Emergency arrangements</h4>' +
@@ -272,7 +344,7 @@
     for (var i = 0; i < v.blankRows; i++) signRows.push('<tr><td></td><td></td><td></td><td></td></tr>');
     if (!signRows.length) signRows.push('<tr><td></td><td></td><td></td><td></td></tr>');
 
-    html += '<section class="doc-section signoff"><h2>6. Sign-off</h2>' +
+    html += '<section class="doc-section signoff"><h2>' + nextSection() + '. Sign-off</h2>' +
       '<p>By signing below, I confirm that I have read and understood this RAMS document, that it has been explained to me, and that I will follow the control measures and method described.</p>' +
       '<table class="sign-table"><thead><tr><th>Name</th><th>Role / company</th><th>Signature</th><th>Date</th></tr></thead>' +
       '<tbody>' + signRows.join('') + '</tbody></table>' +
@@ -286,6 +358,7 @@
       '<br>This document must be reviewed if site conditions, the scope of work or the event plan change.</footer>';
 
     doc.innerHTML = html;
+    doc.className = 'doc detail-' + detail;
     makeEditable();
   }
 
@@ -483,6 +556,7 @@
       currentCreatedAt = record.createdAt;
       currentSavedAt = record.updatedAt;
       busy = false;
+      if (window.RamsStats) window.RamsStats.event('rams-saved/' + store.kind);
       setClean();
       renderSavedList();
     }, function (err) {
@@ -665,6 +739,7 @@
     currentValues = v;
     render(v);
     showDocument(v.eventName);
+    if (window.RamsStats) window.RamsStats.event('rams-generated/' + v.detail);
     dirty = true;
     updateSaveUI();
   });
@@ -694,6 +769,7 @@
   });
 
   document.getElementById('print-btn').addEventListener('click', function () {
+    if (window.RamsStats) window.RamsStats.event('rams-printed');
     window.print();
   });
 

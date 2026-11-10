@@ -48,7 +48,7 @@ body {
 .app-header h1 { margin: 0; font-size: 1.5rem; letter-spacing: -0.01em; }
 .app-header p { margin: 2px 0 0; opacity: 0.85; font-size: 0.95rem; }
 .app-header-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
-.app-header-link { color: var(--brand-ink); font-weight: 600; font-size: 0.92rem; text-underline-offset: 3px; }
+.app-header-link { display: inline-flex; align-items: center; min-height: 40px; color: var(--brand-ink); font-weight: 600; font-size: 0.92rem; text-underline-offset: 3px; }
 .app-header-link:hover { opacity: 0.85; }
 .app-footer a { color: inherit; text-underline-offset: 2px; }
 
@@ -91,6 +91,7 @@ body {
 .field small { font-weight: 400; color: var(--muted); }
 
 input[type="text"],
+input[type="email"],
 input[type="date"],
 input[type="number"],
 select,
@@ -534,17 +535,139 @@ button.rating { cursor: pointer; }
 .account-banner.is-ok { background: var(--low-bg); border-color: #b5dcc4; color: #134d2c; }
 .account-banner.is-error { background: var(--high-bg); border-color: #e6b8b4; color: var(--high); }
 
-.signin-dialog {
-  width: min(440px, calc(100vw - 32px));
-  padding: 24px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  color: var(--ink);
-  background: var(--surface);
-}
 .signin-dialog::backdrop { background: rgba(20, 32, 50, 0.45); }
 .signin-dialog h2 { margin: 0 0 6px; color: var(--brand); font-size: 1.2rem; }
 .signin-form .actions { margin-top: 16px; }
 .signin-status { margin: 10px 0 0; font-size: 0.9rem; min-height: 1.2em; }
 .signin-status.is-error { color: var(--high); font-weight: 600; }
 .signin-status.is-ok { color: var(--low); font-weight: 600; }
+
+/* ---------- Detail level ---------- */
+
+.detail-options { display: grid; grid-template-columns: 1fr; gap: 10px; }
+@media (min-width: 640px) { .detail-options { grid-template-columns: repeat(3, 1fr); } }
+.detail-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+}
+.detail-option:hover { border-color: var(--accent); }
+.detail-option:has(input:checked) { border-color: var(--accent); background: #eef4fb; }
+.detail-option input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--accent); flex-shrink: 0; }
+.detail-option span { display: flex; flex-direction: column; min-width: 0; }
+.detail-option small { color: var(--muted); font-size: 0.85rem; }
+
+.doc .detail-note {
+  padding: 8px 12px;
+  border-left: 4px solid var(--accent);
+  background: #f4f8fd;
+  font-size: 0.88rem;
+}
+
+.check-item { display: flex; align-items: flex-start; gap: 8px; }
+.check-table th:nth-child(2), .check-table th:nth-child(3) { width: 18%; }
+.check-table .check-group th { background: #eef2f7; color: var(--ink); font-weight: 700; }
+.check-box {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  margin-top: 3px;
+  border: 1.5px solid var(--muted);
+  border-radius: 2px;
+}
+@media (max-width: 719px) {
+  .check-table { font-size: 0.85rem; }
+  .check-table th, .check-table td { padding: 6px; }
+}
+@media print {
+  .doc .detail-note { background: none; }
+}
+
+/* Short version: compact layout so it prints on fewer pages. */
+@media (min-width: 900px), print {
+  .detail-short .ms-phase { column-count: 2; column-gap: 24px; }
+  .detail-short .ms-phase h3 { column-span: all; }
+  .detail-short .ms-phase h4 { break-after: avoid; }
+  .detail-short .ms-phase ol { break-inside: avoid-column; }
+}
+@media print {
+  .detail-short { font-size: 9pt; }
+  .detail-short .doc-section h2 { margin-top: 12px; }
+  .detail-short .ra-block h3, .detail-short .ms-phase h3 { margin-top: 10px; }
+  .detail-short .steps li, .detail-short li { margin-bottom: 3px; }
+  .detail-short th, .detail-short td { padding: 5px 7px; }
+}
+
+/* ---------- Dialogs (feedback, sign in) ---------- */
+
+.modal, .signin-dialog {
+  width: min(480px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+  background: var(--surface);
+  overflow: hidden;
+}
+.signin-dialog { padding: 20px; overflow: auto; }
+.modal::backdrop { background: rgba(20, 32, 50, 0.45); }
+.modal h2 { margin: 0 0 4px; color: var(--brand); font-size: 1.2rem; }
+.feedback-form { display: flex; flex-direction: column; max-height: calc(100dvh - 26px); }
+.feedback-body { padding: 20px 20px 4px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+.feedback-body .hint { margin: 0; }
+.feedback-form .actions {
+  margin: 0;
+  padding: 12px 20px 16px;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+.hint.small { font-size: 0.8rem; }
+.optional { font-weight: 400; color: var(--muted); }
+.form-status { margin: 0; font-size: 0.92rem; min-height: 1.2em; }
+.form-status.is-error { color: var(--high); font-weight: 600; }
+.form-status.is-ok { color: var(--low); font-weight: 600; }
+
+.topic-chips { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.topic-chips legend { padding: 0; margin-bottom: 6px; font-weight: 600; font-size: 0.92rem; }
+.chip { position: relative; cursor: pointer; }
+.chip input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.chip span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.88rem;
+  background: #fff;
+}
+.chip input:checked + span { border-color: var(--accent); background: #eef4fb; color: var(--brand); font-weight: 600; }
+.chip input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Spam trap: off-screen for people, still in the form for bots. */
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+.feedback-prompt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin: 0 0 24px;
+  padding: 14px 16px;
+  border: 1px dashed #b9c9de;
+  border-radius: 8px;
+  background: var(--surface);
+}
+.feedback-prompt p { margin: 0; flex: 1 1 240px; font-size: 0.95rem; }
+.app-footer p + p { margin-top: 8px; }
+
+/* Bigger tap targets for the rating badges on touch screens (screen only, not print). */
+@media screen and (pointer: coarse) {
+  .doc button.rating { min-height: 40px; min-width: 88px; padding: 6px 12px; }
+}
