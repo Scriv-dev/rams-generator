@@ -25,7 +25,7 @@ window.RAMS_CONFIG = {
   // Feedback form. Create a form at https://formspree.io and paste its ID here:
   // the part after /f/ in the form's endpoint, e.g. 'xyzabcde'.
   // Leave blank to hide the feedback links.
-  formspreeId: '',
+  formspreeId: 'xeagjqez',
 
   // Visitor counter. Create a site at https://www.goatcounter.com and paste its
   // code here: the 'mysite' in https://mysite.goatcounter.com.
