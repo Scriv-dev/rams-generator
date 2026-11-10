@@ -247,7 +247,7 @@
       esc(v.eventName) + '</strong> at <strong>' + esc(v.venue) + '</strong> on behalf of <strong>' + esc(v.client) +
       '</strong>. The event is ' + esc(type.scope) + '.</p>' +
       '<p>Activities covered:</p><ul class="scope-list">' +
-      selected.map(function (a) { return '<li>' + esc(a.label) + ' – ' + esc(a.short.toLowerCase()) + '</li>'; }).join('') +
+      selected.map(function (a) { return '<li>' + esc(a.label) + ' – ' + esc(a.short) + '</li>'; }).join('') +
       '</ul>' +
       '<p>It was prepared with reference to the Health and Safety at Work etc. Act 1974, the Management of Health and Safety at Work Regulations 1999, the Construction (Design and Management) Regulations 2015 and ' +
       esc(type.guidance) + '.</p>' +
