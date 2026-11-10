@@ -25,6 +25,12 @@ It has no build step, no dependencies and no backend. Everything runs in the bro
 - **Editable before printing:** click any text in the generated document to change it, and tap a risk rating to cycle it between low, medium and high.
 - **Print / Save as PDF:** uses the browser's print dialogue, with A4 print styles. Choose "Save as PDF" as the printer to get a PDF.
 - **Event-type aware:** wording follows the audience (e.g. "guests" for weddings, "festival-goers" for festivals). Weather and wind rows (marked `outdoor: true` in `data.js`) and the wind action plan are left out for corporate events unless a marquee is in use.
+- **Save, reopen, edit and delete:** tap **Save RAMS** to store the generated document, including any text or rating changes, in your browser. The **Saved RAMS** list on the start screen shows each one with its event date, venue, type and when it was last saved.
+  - **Open** brings back the document exactly as you saved it. Keep editing in place, then tap **Save changes**.
+  - **Edit details** takes you back to the form with that RAMS's details filled in. Generating again updates the same saved RAMS, but rebuilds the document, so text changed in the document itself is replaced.
+  - **Delete** needs a second tap within a few seconds, so a stray tap can't lose work.
+  - The app warns you before you leave the page or open another RAMS with unsaved changes.
+  - Saved RAMS stay in this browser on this device only. They don't sync between devices, and clearing site data deletes them. Most browsers allow about 5 MB, which is enough for dozens of documents.
 - **Remembers your form:** form entries are saved in your browser's local storage, so a refresh doesn't lose them. "Clear form" wipes them.
 
 ## Running it

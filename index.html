@@ -17,7 +17,23 @@
   </header>
 
   <main class="wrap">
+    <section id="saved-section" class="card no-print" aria-labelledby="saved-heading">
+      <div class="saved-head">
+        <h2 id="saved-heading">Saved RAMS</h2>
+        <span id="saved-count" class="saved-count"></span>
+      </div>
+      <p id="saved-empty" class="hint">Nothing saved yet. Generate a RAMS and tap <strong>Save RAMS</strong> to keep it here.</p>
+      <ul id="saved-list" class="saved-list"></ul>
+      <p id="storage-error" class="error" role="alert" hidden></p>
+      <p class="hint saved-note">Saved RAMS are stored only in this browser on this device. Clearing your browser data deletes them.</p>
+    </section>
+
     <form id="rams-form" class="card no-print" novalidate>
+      <div id="editing-banner" class="banner" hidden>
+        <p>You're editing the saved RAMS <strong id="editing-name"></strong>. Generating again rebuilds the document from these details, replacing any text you changed in the document itself.</p>
+        <button type="button" id="new-btn" class="btn btn-ghost btn-small">Start a new RAMS instead</button>
+      </div>
+
       <h2>1. Event details</h2>
       <div class="grid">
         <label class="field">
@@ -78,11 +94,14 @@
 
     <section id="output" hidden>
       <div class="toolbar no-print">
-        <p class="hint">Tip: click any text in the document to edit it, and tap a risk rating to change it, before printing.</p>
+        <p class="hint">Tip: click any text in the document to edit it, and tap a risk rating to change it. Save to keep your changes.</p>
         <div class="actions">
-          <button type="button" id="print-btn" class="btn btn-primary">Print / Save as PDF</button>
-          <button type="button" id="edit-btn" class="btn btn-ghost">Back to form</button>
+          <button type="button" id="save-btn" class="btn btn-primary">Save RAMS</button>
+          <button type="button" id="print-btn" class="btn btn-secondary">Print / Save as PDF</button>
+          <button type="button" id="edit-btn" class="btn btn-ghost">Edit details</button>
+          <button type="button" id="list-btn" class="btn btn-ghost">Saved RAMS</button>
         </div>
+        <p id="save-status" class="save-status" role="status" aria-live="polite"></p>
       </div>
       <article id="document" class="doc"></article>
     </section>
