@@ -157,6 +157,27 @@
     return html + '</section>';
   }
 
+  /* Wind action plan: one row per wind-sensitive structure in use (outdoor events only). */
+  function windPlan(v, isOutdoor) {
+    if (!isOutdoor) return '';
+    var rows = (DATA.windPlan || []).filter(function (r) { return v.activities.indexOf(r.activity) !== -1; });
+    if (!rows.length) return '';
+    var blank = '<span class="fill-in">____ m/s</span>';
+    return '<h4>Wind action plan</h4>' +
+      '<p>Fill in each structure\'s figures from its supplier\'s design calculations or operations manual. Use gust speed. ' +
+      'Read the anemometer every 30 minutes, and every 15 minutes once any structure reaches amber.</p>' +
+      '<table class="ra-table wind-table"><thead><tr><th>Structure</th><th>Max design gust</th>' +
+      '<th>Amber trigger and action</th><th>Red trigger and action</th></tr></thead><tbody>' +
+      rows.map(function (r) {
+        return '<tr><td data-label="Structure">' + esc(r.structure) + '</td>' +
+          '<td data-label="Max design gust">' + blank + '</td>' +
+          '<td data-label="Amber trigger and action">' + blank + '<br>' + esc(r.amber) + '</td>' +
+          '<td data-label="Red trigger and action">' + blank + '<br>' + esc(r.red) + '</td></tr>';
+      }).join('') +
+      '</tbody></table>' +
+      '<p class="note">1 m/s ≈ 2.24 mph. Anemometer read and logged by: ____________________</p>';
+  }
+
   function render(v) {
     var type = DATA.eventTypes[v.eventType];
     var ctx = { public: type.public };
@@ -164,7 +185,8 @@
 
     // Outdoor weather row: skip for corporate events unless a marquee/tent is in use.
     var isOutdoor = v.eventType !== 'corporate' || v.activities.indexOf('marquee') !== -1;
-    var generalHazards = DATA.general.hazards.filter(function (h) { return !h.outdoor || isOutdoor; });
+    function applies(h) { return !h.outdoor || isOutdoor; }
+    var generalHazards = DATA.general.hazards.filter(applies);
 
     var M = DATA.method;
     var html = '';
@@ -204,7 +226,7 @@
     html += '<section class="doc-section"><h2>3. Risk assessments</h2>';
     html += riskTable(DATA.general.label, '3.1', generalHazards, ctx);
     selected.forEach(function (a, i) {
-      html += riskTable(a.label, '3.' + (i + 2), a.hazards, ctx);
+      html += riskTable(a.label, '3.' + (i + 2), a.hazards.filter(applies), ctx);
     });
     html += '</section>';
 
@@ -218,15 +240,16 @@
     html += methodPhase('Pack-down', '4.3', M.packdownBefore, phase('packdown'), M.packdownAfter);
     html += '</section>';
 
-    /* 5. PPE and emergency arrangements */
+    /* 5. PPE, weather and emergency arrangements */
     var ppe = ['Safety boots (toe protection)', 'High-visibility vest or jacket'];
     if (v.activities.some(function (k) { return ['rigging', 'height', 'marquee', 'staging'].indexOf(k) !== -1; })) ppe.push('Hard hat in overhead work areas and exclusion zones');
     if (v.activities.some(function (k) { return ['fencing', 'manual', 'staging', 'marquee'].indexOf(k) !== -1; })) ppe.push('Work gloves suited to the task');
     if (v.activities.indexOf('rigging') !== -1) ppe.push('Hearing protection during sound checks and performances');
     if (v.activities.indexOf('height') !== -1) ppe.push('Harness and restraint lanyard in MEWP baskets');
 
-    html += '<section class="doc-section"><h2>5. PPE and emergency arrangements</h2>' +
+    html += '<section class="doc-section"><h2>5. PPE, weather and emergency arrangements</h2>' +
       '<h4>Required PPE</h4><ul>' + ppe.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul>' +
+      windPlan(v, isOutdoor) +
       '<h4>Emergency arrangements</h4>' +
       '<table class="meta-table emergency"><tbody>' +
       '<tr><th>Emergency services</th><td>999 / 112</td></tr>' +
