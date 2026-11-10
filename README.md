@@ -113,7 +113,10 @@ To host it, upload the files to any static host (GitHub Pages, Netlify, an S3 bu
 | File / folder         | Purpose                                                                  |
 |-----------------------|--------------------------------------------------------------------------|
 | `index.html`          | Landing page: what the tool does, who it's for, pricing, disclaimer      |
-| `landing.css`         | Landing page styles                                                      |
+| `landing.css`         | Landing and privacy page styles                                          |
+| `privacy.html`        | Privacy notice (feedback, visitor counting, hosting, local storage)      |
+| `og-image.png`        | Link preview image for social media and messaging apps (1200 × 630)      |
+| `icon.svg`, `favicon-32.png`, `apple-touch-icon.png` | Site icons                                |
 | `app.html`            | The generator: form, saved RAMS list and document view                  |
 | `styles.css`          | App screen styles (mobile-first), print styles, shared tokens            |
 | `app.js`              | Form handling, validation, rendering, saving and printing                |
@@ -127,6 +130,9 @@ To host it, upload the files to any static host (GitHub Pages, Netlify, an S3 bu
 | `docs/accounts-and-payments.md` | Step-by-step setup for Supabase and Stripe                     |
 
 ## Customising the content
+
+When you change the hazards, controls or method steps, update `contentUpdated` at the top of `data.js` and the "Content last updated" date on `index.html`. Once a competent person has reviewed the content, you can change the wording to say so. If you change what the site collects (for example, by switching on Pro accounts), update `privacy.html` too.
+
 
 All the wording lives in `data.js`, so you can tailor it to your company without touching the app logic.
 

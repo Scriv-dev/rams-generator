@@ -11,6 +11,10 @@
  */
 
 window.RAMS_DATA = {
+  /* Shown on every generated RAMS. Update it (and the date on index.html)
+     whenever the hazards, controls or method steps change. */
+  contentUpdated: 'November 2026',
+
   eventTypes: {
     festival: {
       label: 'Festival',
